@@ -1,0 +1,18 @@
+<header class="w-full border-b border-cyan-500/10 bg-[#070D18]/80 backdrop-blur-md px-6 py-3 flex items-center justify-between text-xs font-mono tracking-wider text-slate-400 select-none z-20">
+  <a href="{{ url_for('main.index') }}" class="flex items-center gap-3">
+    <span class="flex h-2 w-2 relative">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+    </span>
+    <span class="text-slate-300 font-semibold">ESRMS CORE v4.8.2</span>
+    <span class="hidden sm:inline text-slate-600">|</span>
+    <span class="hidden sm:inline">NODE ID: PAC-WEST-911</span>
+  </a>
+  <div class="flex items-center gap-4">
+    <span class="hidden md:inline text-slate-500">SEC-LEVEL: DEFCON 4 (ACTIVE ROUTING)</span>
+    {% if current_user %}
+    <a href="{{ url_for('auth.logout') }}" class="text-slate-400 hover:text-cyan-400 transition-colors">SIGN OUT</a>
+    {% endif %}
+    <span class="bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded text-[0.6875rem] font-medium" id="live-clock">PHT --:--:--</span>
+  </div>
+</header>

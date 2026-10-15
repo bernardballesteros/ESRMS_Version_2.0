@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ sections[section] }}{% endblock %}
+{% block tailwind_theme %}
+<script src="{{ url_for('static', filename='js/tailwind.dashboard.js') }}"></script>
+{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+{% block body_class %}bg-[#080c14] text-slate-100 font-sans min-h-screen antialiased{% endblock %}
+
+{% block header %}
+{% include "dashboard/partials/_topbar.html" %}
+{% endblock %}
+
+{% set subtitles = {
+  'display': 'How big things are, and how many cards fit in a row.',
+  'profile': 'View and manage your account information',
+  'agency': "Manage your agency's information and settings",
+  'security': 'Manage your password and account security',
+  'notifications': 'Manage how you receive important updates and alerts',
+} %}
+{% set icons = {
+  'display': 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+  'profile': 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+  'agency': 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+  'security': 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+  'notifications': 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+} %}
+{% set nav_item = "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm whitespace-nowrap transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan" %}
+
+{% block content %}
+<div class="flex-1 flex flex-col md:flex-row">
+  <aside class="md:w-60 shrink-0 bg-[#0a0e18] border-b md:border-b-0 md:border-r border-brand-borderSubtle">
+    <nav aria-label="Settings" class="flex md:flex-col gap-1 p-2 md:p-3 overflow-x-auto">
+      <a href="{{ url_for('main.dashboard') }}" class="{{ nav_item }} text-slate-300 hover:bg-white/5 hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Dashboard
+      </a>
+      <div class="hidden md:block my-2 border-t border-brand-borderSubtle"></div>
+      <p class="hidden md:block px-3 pb-1 text-[0.6875rem] font-mono font-bold uppercase tracking-widest text-slate-500">Settings</p>
+      {% for key, label in sections.items() %}
+      <a href="{{ url_for('account.settings', section=key) }}" {% if key == section %}aria-current="page"{% endif %}
+         class="{{ nav_item }} {{ 'bg-brand-cyan/15 text-brand-cyan font-semibold' if key == section else 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="{{ icons[key] }}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        {{ label }}
+      </a>
+      {% endfor %}
+      <div class="hidden md:block my-2 border-t border-brand-borderSubtle"></div>
+      <a href="{{ url_for('auth.logout') }}" class="{{ nav_item }} text-slate-300 hover:bg-red-500/10 hover:text-red-300">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Log out
+      </a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 min-w-0 p-4 md:p-6">
+    <div class="max-w-5xl">
+      <h1 class="text-xl font-bold text-white tracking-tight">{{ sections[section] }}</h1>
+      <p class="text-xs text-slate-400 mt-0.5 mb-4">{{ subtitles[section] }}</p>
+      {% include "partials/_flashes.html" %}
+
+      <div id="account-loading" class="space-y-3" role="status" aria-live="polite">
+        <span class="sr-only">Loading…</span>
+        <div class="h-24 rounded-lg bg-brand-card border border-brand-borderSubtle animate-pulse"></div>
+        <div class="h-64 rounded-lg bg-brand-card border border-brand-borderSubtle animate-pulse"></div>
+      </div>
+      <div id="account-error" class="hidden rounded-lg border border-red-500/40 bg-red-950/40 p-6 text-center" role="alert">
+        <span class="material-symbols-outlined text-red-400 text-[2rem]" aria-hidden="true">cloud_off</span>
+        <p data-text class="text-sm text-red-200 mt-1"></p>
+        <button type="button" id="account-retry" class="mt-3 px-4 py-2 rounded-md text-sm border border-red-400/50 text-red-100 hover:bg-red-500/10">Try again</button>
+      </div>
+      <div id="account-body" class="hidden">
+        {% include "account/_" ~ section ~ ".html" %}
+      </div>
+    </div>
+  </main>
+</div>
+
+<dialog id="account-confirm" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-sm text-slate-100">
+  <form method="dialog" class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl p-5">
+    <h2 data-title class="font-bold text-white"></h2>
+    <p data-text class="text-sm text-slate-400 mt-1"></p>
+    <div class="flex justify-end gap-2 mt-5">
+      <button value="cancel" class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+      <button value="ok" data-ok class="px-4 py-2 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-500 text-white"></button>
+    </div>
+  </form>
+</dialog>
+
+<script type="application/json" id="account-config">{{ account_config | tojson }}</script>
+{% include "dashboard/partials/_notify_config.html" %}
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/announcements-realtime.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+<script src="{{ url_for('static', filename='js/account.js') }}"></script>
+{% endblock %}

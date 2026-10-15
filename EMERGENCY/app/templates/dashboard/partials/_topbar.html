@@ -1,0 +1,57 @@
+{% set name_parts = (current_user.name or 'User').split() %}
+{% set initials = (name_parts[0][0] ~ (name_parts[-1][0] if name_parts|length > 1 else ''))|upper %}
+<header class="w-full bg-brand-surface border-b border-brand-border px-4 py-2.5 flex items-center justify-between shadow-tacticalCyan shrink-0 z-50 relative">
+  <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-3.5">
+    <div class="w-12 h-12 rounded-xl bg-[#0e1628] border-2 border-brand-cyan/80 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+      <svg class="w-full h-full text-brand-cyan" fill="none" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-dasharray="3 3" stroke-opacity="0.4" stroke-width="2"/>
+        <circle cx="50" cy="50" r="30" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.8"/>
+        <circle cx="50" cy="50" r="15" stroke="currentColor" stroke-opacity="0.8" stroke-width="1.5"/>
+        <line stroke="currentColor" stroke-opacity="0.5" stroke-width="1.5" x1="50" x2="50" y1="5" y2="95"/>
+        <line stroke="currentColor" stroke-opacity="0.5" stroke-width="1.5" x1="5" x2="95" y1="50" y2="50"/>
+        <g class="radar-sweep-blade"><path d="M 50 50 L 50 8 A 42 42 0 0 1 85 24 Z" fill="currentColor" opacity="0.35"/></g>
+        <path d="M25 52 L 40 52 L 46 38 L 52 64 L 58 48 L 64 52 L 75 52" stroke="#00e5ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="text-2xl font-extrabold tracking-wider text-white uppercase">ESRMS</span>
+        <span class="text-[0.625rem] font-mono font-bold tracking-widest px-1.5 py-0.5 rounded bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/40">CAD 9.4-PRO</span>
+      </div>
+      <p class="text-[0.6875rem] text-slate-400 font-mono tracking-tight hidden sm:block">Emergency SOS &amp; Response Management System</p>
+    </div>
+  </a>
+
+  <div class="flex items-center gap-3">
+    <div class="hidden md:flex items-center gap-3 bg-[#111726] border border-brand-borderSubtle px-4 py-1.5 rounded-lg">
+      <svg class="w-4 h-4 text-brand-cyan animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      <div class="font-mono text-xs flex items-baseline gap-2">
+        <span class="font-bold text-slate-100 text-sm tracking-widest" id="live-clock">PHT --:--:--</span>
+        <span class="text-slate-400 hidden lg:inline" id="utc-clock">| UTC --:--:--</span>
+      </div>
+    </div>
+    <div class="hidden sm:flex items-center gap-2 bg-[#101b24] border border-emerald-500/40 px-3.5 py-1.5 rounded-lg">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <span class="font-mono text-xs font-bold tracking-wider text-slate-200">System Live</span>
+    </div>
+
+    <div class="relative pl-2 border-l border-brand-borderSubtle">
+      <button type="button" id="account-trigger" aria-haspopup="menu" aria-expanded="false" aria-controls="account-menu"
+              class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan">
+        <span class="relative">
+          <span data-avatar class="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-tr from-brand-cyan/20 to-brand-cyan/80 border-2 border-brand-cyan flex items-center justify-center shadow-[0_0_10px_rgba(0,229,255,0.4)] font-mono text-xs font-bold text-black">{% if current_user.avatar_url %}<img src="{{ current_user.avatar_url }}" alt="" class="w-full h-full object-cover">{% else %}{{ initials }}{% endif %}</span>
+          <span data-duty-dot class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-brand-surface bg-slate-500 {{ '' if can_dispatch else 'hidden' }}"></span>
+        </span>
+        <span class="text-left hidden lg:block pr-1">
+          <span data-user-name class="block text-xs font-bold text-slate-200 leading-tight">{{ current_user.name }}</span>
+          <span class="block text-[0.625rem] font-mono text-slate-400">{{ current_user.ori_code or (current_user.role or 'user')|upper }}</span>
+        </span>
+        <svg class="w-3.5 h-3.5 text-slate-400 hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      </button>
+      {% include "dashboard/partials/_account_menu.html" %}
+    </div>
+  </div>
+</header>

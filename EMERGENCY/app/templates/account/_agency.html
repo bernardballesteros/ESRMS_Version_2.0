@@ -1,0 +1,118 @@
+{% from "account/_macros.html" import input, label, card, primary, secondary, outline, field, form_error %}
+{# System administrators choose which agency to manage; the list is loaded from the database. #}
+<div id="agency-picker" class="hidden {{ card }} p-4 mb-4">
+  <label for="agency-select" class="{{ label }}">Agency</label>
+  <select id="agency-select" class="{{ input }} max-w-md"><option value="">Select an agency…</option></select>
+  <p id="agency-picker-note" class="text-[0.6875rem] text-slate-500 mt-1">As a system administrator you can manage any registered agency.</p>
+</div>
+
+<div id="agency-denied" class="hidden rounded-lg border border-amber-500/30 bg-amber-950/20 p-8 text-center" role="alert">
+  <span class="material-symbols-outlined text-amber-400 text-[2.25rem]" aria-hidden="true">lock</span>
+  <h2 class="text-base font-bold text-white mt-2">No agency to show</h2>
+  <p data-text class="text-sm text-slate-400 mt-1 max-w-md mx-auto"></p>
+  <a href="{{ url_for('main.dashboard') }}" class="inline-block mt-4 px-4 py-2 rounded-md text-sm border border-brand-cyan/50 text-brand-cyan hover:bg-brand-cyan/10">Back to dashboard</a>
+</div>
+
+<div id="agency-content" class="hidden">
+  <p id="agency-readonly" class="hidden mb-4 p-3 rounded-lg bg-white/5 border border-brand-borderSubtle text-sm text-slate-300" role="status">
+    You are viewing your agency's information. Only the agency's administrator can change it.
+  </p>
+
+  <section class="{{ card }} p-5 flex flex-wrap items-center gap-4" aria-label="Agency">
+    <span id="agency-logo" class="w-16 h-16 shrink-0 rounded-full overflow-hidden bg-[#0a1020] border-2 border-brand-cyan/60 flex items-center justify-center text-brand-cyan">
+      <span class="material-symbols-outlined text-[1.875rem]" aria-hidden="true">apartment</span>
+    </span>
+    <div class="min-w-0 flex-1">
+      <p id="agency-title" class="text-base font-bold text-white break-words"></p>
+      <div class="flex flex-wrap items-center gap-2 mt-1">
+        <span id="agency-code" class="px-2 py-0.5 rounded text-[0.6875rem] font-mono bg-white/5 border border-brand-borderSubtle text-slate-300"></span>
+        <span id="agency-status" class="px-2 py-0.5 rounded text-[0.6875rem] font-semibold border"></span>
+      </div>
+    </div>
+    <input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" aria-label="Choose an agency logo">
+    <div data-edit-only class="flex gap-2">
+      <button type="button" id="logo-remove" class="hidden px-3 py-2 rounded-md text-xs text-slate-300 hover:bg-white/10">Remove</button>
+      <button type="button" id="logo-change" class="{{ outline }} !text-xs">Change Logo</button>
+    </div>
+  </section>
+
+  <section class="{{ card }} mt-4">
+    <div role="tablist" aria-label="Agency settings" class="flex gap-1 px-3 border-b border-brand-borderSubtle overflow-x-auto">
+      {% for key, text in [('general', 'General Information'), ('config', 'Configuration'), ('personnel', 'Personnel')] %}
+      <button type="button" role="tab" id="agency-tab-{{ key }}" data-agency-tab="{{ key }}" aria-controls="agency-panel-{{ key }}" aria-selected="{{ 'true' if loop.first else 'false' }}"
+              class="px-4 py-3 text-xs font-semibold whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-200 aria-selected:text-brand-cyan aria-selected:border-brand-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan">{{ text }}</button>
+      {% endfor %}
+    </div>
+
+    <form id="agency-form" novalidate>
+      <div class="px-5 pt-4">{{ form_error('agency-form-error') }}</div>
+
+      <div id="agency-panel-general" role="tabpanel" aria-labelledby="agency-tab-general" class="px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-4">
+          {{ field('ag-name', 'agency_name', 'Agency Name', required=true, maxlength=120, attrs='autocomplete="organization"') }}
+          <div>
+            <label for="ag-code" class="{{ label }}">Agency Code</label>
+            <input id="ag-code" name="ori_code" maxlength="9" readonly aria-describedby="ag-code-hint ag-code-error" class="{{ input }} font-mono uppercase">
+            <p id="ag-code-hint" class="text-[0.6875rem] text-slate-500 mt-1">Assigned at registration. Only an ESRMS system administrator can change it.</p>
+            <p id="ag-code-error" data-error-for="ori_code" class="hidden text-xs text-red-400 mt-1"></p>
+          </div>
+          {{ field('ag-email', 'agency_email', 'Email Address', required=true, type='email', maxlength=254) }}
+          {{ field('ag-phone', 'psap_phone', 'Contact Number', required=true, type='tel', maxlength=32, attrs='placeholder="+63 82 221 911"') }}
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="ag-address" class="{{ label }}">Office Address <span class="text-red-400" aria-hidden="true">*</span></label>
+            <textarea id="ag-address" name="agency_address" rows="3" maxlength="300" required aria-required="true" aria-describedby="ag-address-error" class="{{ input }}"></textarea>
+            <p id="ag-address-error" data-error-for="agency_address" class="hidden text-xs text-red-400 mt-1"></p>
+          </div>
+          <div>
+            <label for="ag-desc" class="{{ label }}">Description <span class="font-normal text-slate-500">(optional)</span></label>
+            <textarea id="ag-desc" name="agency_description" rows="4" maxlength="500" aria-describedby="ag-desc-error" class="{{ input }}"></textarea>
+            <p id="ag-desc-error" data-error-for="agency_description" class="hidden text-xs text-red-400 mt-1"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="agency-panel-config" role="tabpanel" aria-labelledby="agency-tab-config" class="hidden px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="ag-type" class="{{ label }}">Agency Type <span class="text-red-400" aria-hidden="true">*</span></label>
+          <select id="ag-type" name="agency_type" required aria-required="true" aria-describedby="ag-type-error" class="{{ input }}">
+            <option value="">Select…</option>
+            {% for k, v in account_config.agencyTypes.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}
+          </select>
+          <p id="ag-type-error" data-error-for="agency_type" class="hidden text-xs text-red-400 mt-1"></p>
+        </div>
+        {{ field('ag-jurisdiction', 'jurisdiction', 'Jurisdiction', required=true, maxlength=120, hint='Shown in the Dispatch Center header.') }}
+        {{ field('ag-cad', 'cad_cert', 'CAD Certification', attrs='readonly', hint='Recorded at registration; not editable here.') }}
+        <div id="agency-status-field" class="hidden">
+          <label for="ag-status" class="{{ label }}">Verification Status <span class="font-normal text-slate-500">(system administrators only)</span></label>
+          <select id="ag-status" name="status" aria-describedby="ag-status-error" class="{{ input }}">
+            {% for k, v in account_config.agencyStatuses.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}
+          </select>
+          <p id="ag-status-error" data-error-for="status" class="hidden text-xs text-red-400 mt-1"></p>
+        </div>
+      </div>
+
+      <div id="agency-form-footer" class="flex flex-wrap items-center justify-between gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <p id="agency-updated" class="text-[0.6875rem] text-slate-500"></p>
+        <div data-edit-only class="flex gap-2 ml-auto">
+          <button type="button" data-cancel class="{{ secondary }}">Cancel</button>
+          <button type="submit" class="{{ primary }}">Save Changes</button>
+        </div>
+      </div>
+    </form>
+
+    <div id="agency-panel-personnel" role="tabpanel" aria-labelledby="agency-tab-personnel" class="hidden px-5 py-4">
+      <p class="text-xs text-slate-400">Responders you add here can open Agency Settings and view this agency's information. They cannot change it.</p>
+      <form id="personnel-form" novalidate class="mt-3 flex flex-wrap items-start gap-2">
+        <div class="flex-1 min-w-[13.75rem]">
+          <label for="personnel-email" class="sr-only">Responder account email</label>
+          <input id="personnel-email" name="email" type="email" maxlength="254" required placeholder="Responder's account email" aria-describedby="personnel-email-error" class="{{ input }}">
+          <p id="personnel-email-error" data-error-for="email" class="hidden text-xs text-red-400 mt-1"></p>
+        </div>
+        <button type="submit" class="{{ outline }}">Add Responder</button>
+      </form>
+      <ul id="personnel-list" class="mt-4 divide-y divide-brand-borderSubtle text-sm"></ul>
+    </div>
+  </section>
+</div>

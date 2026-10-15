@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{# The signed-in user's display size (Settings -> Display). Sizes are in rem, so the whole interface follows it. #}
+<html lang="en" class="{% block html_class %}{% endblock %}"{% if display_scale %} style="font-size: {{ display_scale }}%" data-display-scale="{{ display_scale }}"{% endif %}>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ESRMS{% endblock %} | Emergency SOS & Response Management System</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/emblem.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  {% block tailwind_theme %}
+  <script src="{{ url_for('static', filename='js/tailwind.esrms.js') }}"></script>
+  {% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/esrms.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}bg-bgDark text-textLight font-sans{% endblock %} relative flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+  {% block background %}{% endblock %}
+
+  {% block header %}{% include "partials/_header.html" %}{% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% block footer %}{% include "partials/_footer.html" %}{% endblock %}
+
+  <script src="{{ url_for('static', filename='js/esrms.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

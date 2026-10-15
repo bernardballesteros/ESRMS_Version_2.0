@@ -1,0 +1,130 @@
+{# Dispatch Center dialogs: add/edit an organization base, send a signal to one, and the shared confirm dialog. #}
+{% set input = "w-full px-3 py-2 rounded-md bg-[#0a1020] border border-brand-borderSubtle text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/40" %}
+{% set label = "block text-xs font-semibold text-slate-300 mb-1" %}
+{% set err = "hidden text-xs text-red-400 mt-1" %}
+<dialog id="org-dialog" class="esrms-focus backdrop:bg-black/70 bg-transparent p-0 w-full max-w-xl text-slate-100" aria-labelledby="org-form-title">
+  <div class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-brand-borderSubtle">
+      <h2 id="org-form-title" class="text-base font-bold text-white">Add Organization</h2>
+      <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+    </div>
+    <div class="max-h-[72vh] overflow-y-auto">
+      <form id="org-form" novalidate class="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div id="org-form-error" class="sm:col-span-2 hidden p-3 rounded-md bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert"></div>
+        <div class="sm:col-span-2">
+          <label for="org-name" class="{{ label }}">Organization name <span class="text-red-400">*</span></label>
+          <input id="org-name" name="name" maxlength="120" required class="{{ input }}" placeholder="e.g. City EMS">
+          <p data-error-for="name" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-type" class="{{ label }}">Organization type <span class="text-red-400">*</span></label>
+          <select id="org-type" name="org_type" required class="{{ input }}">
+            <option value="">Select…</option>
+            {% for k, v in hospital_options.orgTypes.items() %}<option value="{{ k }}">{{ v | upper }}</option>{% endfor %}
+          </select>
+          <p data-error-for="org_type" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-base" class="{{ label }}">Base / station name</label>
+          <input id="org-base" name="base_name" maxlength="120" class="{{ input }}" placeholder="e.g. Main Station">
+          <p data-error-for="base_name" class="{{ err }}"></p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="org-address" class="{{ label }}">Address</label>
+          <input id="org-address" name="address" maxlength="300" class="{{ input }}">
+          <p data-error-for="address" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-city" class="{{ label }}">City</label>
+          <input id="org-city" name="city" maxlength="100" class="{{ input }}">
+          <p data-error-for="city" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-province" class="{{ label }}">Province</label>
+          <input id="org-province" name="province" maxlength="100" class="{{ input }}">
+          <p data-error-for="province" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-lat" class="{{ label }}">Base latitude <span class="text-red-400">*</span></label>
+          <input id="org-lat" name="latitude" inputmode="decimal" maxlength="20" required class="{{ input }} font-mono" placeholder="7.0731">
+          <p data-error-for="latitude" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-lng" class="{{ label }}">Base longitude <span class="text-red-400">*</span></label>
+          <input id="org-lng" name="longitude" inputmode="decimal" maxlength="20" required class="{{ input }} font-mono" placeholder="125.6128">
+          <p data-error-for="longitude" class="{{ err }}"></p>
+        </div>
+        <p class="sm:col-span-2 -mt-1 text-[0.6875rem] text-slate-400">The official base or station of the organization. It is a fixed place, not the position of a responder.</p>
+        <div>
+          <label for="org-phone" class="{{ label }}">Contact number</label>
+          <input id="org-phone" name="phone_number" type="tel" maxlength="25" class="{{ input }} font-mono" placeholder="+63 82 123 4567">
+          <p data-error-for="phone_number" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="org-availability" class="{{ label }}">Availability status</label>
+          <select id="org-availability" name="availability" class="{{ input }}">
+            {% for k, v in hospital_options.orgAvailability.items() %}<option value="{{ k }}">{{ v | upper }}</option>{% endfor %}
+          </select>
+          <p data-error-for="availability" class="{{ err }}"></p>
+        </div>
+        <label class="flex items-center gap-2 text-sm text-slate-200"><input type="checkbox" name="is_active" checked class="rounded border-brand-border bg-[#0a1020]"> Enabled (shown on the map and recommended)</label>
+        <label id="org-verified-row" class="hidden flex items-center gap-2 text-sm text-slate-200"><input type="checkbox" name="verified" class="rounded border-brand-border bg-[#0a1020]"> Verified organization</label>
+        <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-2 pt-2">
+          <button type="button" id="org-delete" class="hidden text-xs text-red-300 underline">Delete organization</button>
+          <span class="flex gap-2 ml-auto">
+            <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-md text-sm font-bold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12] disabled:opacity-60">Save</button>
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="org-send" class="esrms-focus backdrop:bg-black/70 bg-transparent p-0 w-full max-w-md text-slate-100" aria-labelledby="org-send-title">
+  <form id="org-send-form" novalidate class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+    <h2 id="org-send-title" class="px-5 py-4 border-b border-brand-borderSubtle text-base font-bold text-white">Send Emergency Signal?</h2>
+    <div class="px-5 py-4 space-y-3">
+      <div id="org-send-error" class="hidden p-3 rounded-md bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert"></div>
+      <div id="org-send-summary" class="text-sm space-y-0.5"></div>
+      <div id="org-send-warning" class="hidden p-3 rounded-lg border border-amber-500/50 bg-amber-950/40 text-xs text-amber-100" role="alert"></div>
+      <div>
+        <label for="org-send-priority" class="{{ label }}">Priority</label>
+        <select id="org-send-priority" name="priority" class="{{ input }}">
+          {% for k, v in hospital_options.triage.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="org-send-message" class="{{ label }}">Message to the organization</label>
+        <textarea id="org-send-message" name="message" rows="3" maxlength="{{ hospital_options.messageLimit }}" class="{{ input }}"></textarea>
+        <p class="text-[0.6875rem] text-slate-400 mt-1">The organization decides which of its own personnel and units to deploy.</p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+      <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+      <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12] disabled:opacity-60">
+        <span class="material-symbols-outlined text-[1.125rem]" aria-hidden="true">send</span>Send Signal</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dispatch-confirm" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-sm text-slate-100">
+  <form method="dialog" class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl p-5">
+    <h2 data-title class="font-bold text-white"></h2>
+    <p data-text class="text-sm text-slate-400 mt-1"></p>
+    <div class="flex justify-end gap-2 mt-5">
+      <button value="cancel" class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+      <button value="ok" data-ok class="px-4 py-2 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-500 text-white"></button>
+    </div>
+  </form>
+</dialog>
+
+<script type="application/json" id="org-config">{{ {
+  'options': hospital_options,
+  'canDispatch': can_dispatch,
+  'api': {
+    'organizations': url_for('hospital.list_hospitals'),
+    'nearby': url_for('hospital.nearby_organizations'),
+    'send': '/api/organizations',
+  },
+} | tojson }}</script>

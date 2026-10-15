@@ -1,0 +1,28 @@
+{# Shared frame for the Hospital Portal landing, sign-in and registration pages. #}
+{% extends "base.html" %}
+{% block background %}
+<div class="fixed inset-0 bg-grid-tech pointer-events-none opacity-40"></div>
+<div class="fixed inset-0 ambient-radial pointer-events-none"></div>
+{% endblock %}
+{% block header %}
+<header class="relative z-10 w-full px-4 sm:px-8 py-3 flex items-center justify-between border-b border-cyan-500/10 bg-[#050A12]/80 backdrop-blur">
+  <a href="{{ url_for('hospital_auth.login') }}" class="flex items-center gap-2 text-white font-extrabold tracking-wide">
+    <span class="material-symbols-outlined text-cyanAccent" aria-hidden="true">local_hospital</span>
+    ESRMS <span class="text-xs font-mono font-medium px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">HOSPITAL PORTAL</span>
+  </a>
+  <a href="{{ url_for('main.index') }}" class="text-xs font-mono text-slate-300 hover:text-cyanAccent underline">ESRMS gateway</a>
+</header>
+{% endblock %}
+{% block content %}
+<main class="relative z-10 w-full max-w-5xl mx-auto px-4 py-8 md:py-10 flex-1 flex flex-col items-center justify-center">
+  <section class="flex flex-col items-center text-center space-y-2 mb-6">
+    <div class="w-16 h-16 rounded-2xl bg-[#0D1420] border-2 border-cyan-400/70 flex items-center justify-center shadow-[0_0_24px_rgba(0,217,255,0.3)]">
+      <span class="material-symbols-outlined text-cyanAccent text-[2.25rem]" aria-hidden="true">medical_services</span>
+    </div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-white">Hospital Portal</h1>
+    <p class="text-sm text-slate-300 font-medium">Emergency Medical Receiving System</p>
+  </section>
+  {% block card %}{% endblock %}
+  <p class="mt-6 text-center text-[0.6875rem] font-mono text-slate-400 tracking-wider">PATIENT DATA IS VISIBLE ONLY TO THE RECEIVING HOSPITAL • ENCRYPTED IN TRANSIT</p>
+</main>
+{% endblock %}

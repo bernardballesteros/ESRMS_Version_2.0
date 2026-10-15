@@ -1,0 +1,367 @@
+{# Hospital Signal tab: dispatcher side. Filled by static/js/hospital-signal.js from /api/hospital-signals
+   (app/routes/hospital.py). Hospitals and signals come from the database; nothing here is sample data. #}
+{% set card = "rounded-xl bg-[#0b1220] border border-brand-border shadow-[0_0_18px_-8px_rgba(0,229,255,0.35)]" %}
+{% set input = "w-full px-3 py-2 rounded-lg bg-[#0a1020] border border-brand-border text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/40" %}
+{% set small = "px-2.5 py-1.5 rounded-md bg-[#0a1020] border border-brand-borderSubtle text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-cyan" %}
+{% set label = "flex items-center gap-1.5 text-xs font-semibold text-slate-200 mb-1.5" %}
+{% set heading = "flex items-center gap-2 text-sm font-bold text-white" %}
+{% set primary = "inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12] disabled:opacity-60" %}
+{% set ghost = "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border border-brand-cyan/50 text-brand-cyan hover:bg-brand-cyan/10" %}
+{% set dialog = "backdrop:bg-black/70 bg-transparent p-0 w-full text-slate-100" %}
+{% set err = "hidden text-xs text-red-400 mt-1" %}
+<div id="hospital-signal" class="esrms-focus w-full max-w-[100rem] mx-auto px-3 sm:px-5 py-5 text-slate-100">
+  <script type="application/json" id="hospital-signal-config">{{ {
+    'options': hospital_options,
+    'api': {
+      'hospitals': url_for('hospital.list_hospitals'),
+      'incidents': url_for('hospital.search_incidents'),
+      'signals': url_for('hospital.list_signals'),
+    },
+  } | tojson }}</script>
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-brand-cyan text-[2.375rem]" aria-hidden="true">medical_services</span>
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Hospital Signal</h1>
+        <p class="text-sm text-brand-cyan/80">Send patient information to the receiving hospital</p>
+      </div>
+    </div>
+    <div id="hs-connection" role="status" aria-live="polite"
+         class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/5 text-xs font-mono font-semibold text-amber-200">
+      <span class="material-symbols-outlined text-[1rem]" aria-hidden="true" data-icon>wifi_find</span>
+      <span data-text>Connecting…</span>
+      <span data-dot class="w-2 h-2 rounded-full bg-amber-400"></span>
+    </div>
+  </div>
+
+  <div id="hs-error" class="hidden mt-4 p-4 rounded-xl border border-red-500/40 bg-red-950/40 flex flex-wrap items-center gap-3" role="alert">
+    <span class="material-symbols-outlined text-red-400" aria-hidden="true">cloud_off</span>
+    <p data-text class="flex-1 text-sm text-red-200"></p>
+    <button type="button" id="hs-retry" class="text-sm underline text-red-200">Retry</button>
+  </div>
+
+  <div class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+    {# ------------------------------------------------ form #}
+    <section class="lg:col-span-7 {{ card }} min-w-0" aria-labelledby="hs-form-title">
+      <h2 id="hs-form-title" class="{{ heading }} px-4 py-3 border-b border-brand-borderSubtle">
+        <span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">add_circle</span>
+        New Patient Signal
+      </h2>
+      <form id="hs-form" novalidate class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div id="hs-form-error" class="sm:col-span-2 hidden p-3 rounded-lg bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert" tabindex="-1"></div>
+
+        <div>
+          <label for="hs-hospital" class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">local_hospital</span>Hospital <span class="text-red-400">*</span></label>
+          <select id="hs-hospital" name="hospital_id" required class="{{ input }}"><option value="">Loading hospitals…</option></select>
+          <p data-error-for="hospital_id" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label for="hs-type" class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">sensors</span>Signal Type <span class="text-red-400">*</span></label>
+          <select id="hs-type" name="signal_type" required class="{{ input }}">
+            {% for key, text in hospital_options.signalTypes.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+          </select>
+          <p data-error-for="signal_type" class="{{ err }}"></p>
+        </div>
+
+        <div>
+          <label for="hs-name" class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">person</span>Patient Name <span class="font-normal text-slate-400">(Optional)</span></label>
+          <input id="hs-name" name="patient_name" maxlength="120" autocomplete="off" placeholder="Enter patient name" class="{{ input }}">
+          <p data-error-for="patient_name" class="{{ err }}"></p>
+        </div>
+        <div>
+          <span class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">wc</span>Age / Gender <span class="font-normal text-slate-400">(Optional)</span></span>
+          <div class="grid grid-cols-2 gap-2">
+            <input name="patient_age" type="number" min="0" max="130" step="1" inputmode="numeric" placeholder="Age" aria-label="Patient age" class="{{ input }}">
+            <select name="patient_gender" aria-label="Patient gender" class="{{ input }}">
+              <option value="">Select gender</option>
+              {% for key, text in hospital_options.genders.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+            </select>
+          </div>
+          <p data-error-for="patient_age" class="{{ err }}"></p>
+          <p data-error-for="patient_gender" class="{{ err }}"></p>
+        </div>
+
+        <div class="relative">
+          <label for="hs-incident-search" class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">tag</span>Incident / Case Number</label>
+          <input type="hidden" name="incident_id">
+          <div id="hs-incident-chosen" class="hidden items-center gap-2 px-3 py-2 rounded-lg bg-brand-cyan/10 border border-brand-cyan/40 text-sm"></div>
+          <input id="hs-incident-search" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="hs-incident-list" aria-autocomplete="list"
+                 placeholder="Search INC number or emergency type" class="{{ input }}">
+          <ul id="hs-incident-list" role="listbox" aria-label="Matching incidents"
+              class="hidden absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-lg bg-[#0d1424] border border-brand-border shadow-2xl py-1"></ul>
+          <p class="text-[0.6875rem] text-slate-400 mt-1">Links this signal to an existing ESRMS incident. Leave empty if there is none.</p>
+          <p data-error-for="incident_id" class="{{ err }}"></p>
+        </div>
+        <div>
+          <span class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">schedule</span>ETA (Estimated Time of Arrival)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <input name="eta_time" type="time" aria-label="Estimated arrival time" class="{{ input }} [color-scheme:dark]">
+            <input name="eta_date" type="date" aria-label="Estimated arrival date" value="{{ hospital_options.today }}" min="{{ hospital_options.today }}" class="{{ input }} [color-scheme:dark]">
+          </div>
+          <p class="text-[0.6875rem] text-slate-400 mt-1">Philippine Time. ESRMS does not calculate an ETA; enter the crew's estimate.</p>
+          <p data-error-for="eta_time" class="{{ err }}"></p>
+          <p data-error-for="eta_date" class="{{ err }}"></p>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="hs-condition" class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">monitor_heart</span>Patient Condition <span class="text-red-400">*</span></label>
+          <select id="hs-condition" name="patient_condition" required class="{{ input }}">
+            <option value="">Select condition</option>
+            {% for key, text in hospital_options.conditions.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+          </select>
+          <p data-error-for="patient_condition" class="{{ err }}"></p>
+        </div>
+
+        <details class="sm:col-span-2 rounded-lg border border-brand-borderSubtle bg-[#0a1020]/60">
+          <summary class="cursor-pointer px-3 py-2 text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">ambulance</span>EMS transport, triage &amp; vitals <span class="font-normal text-slate-400">(optional, shown in the hospital's full report)</span>
+          </summary>
+          <div class="px-3 pb-3 pt-1 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="col-span-2">
+              <label for="hs-medic" class="{{ label }}">Medic Unit</label>
+              <input id="hs-medic" name="medic_unit" maxlength="40" autocomplete="off" placeholder="e.g. Medic 02" class="{{ input }}">
+              <p data-error-for="medic_unit" class="{{ err }}"></p>
+            </div>
+            <div class="col-span-2">
+              <label for="hs-transport" class="{{ label }}">Transport Type</label>
+              <select id="hs-transport" name="transport_type" class="{{ input }}">
+                <option value="">Not specified</option>
+                {% for key, text in hospital_options.transportTypes.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+              </select>
+              <p data-error-for="transport_type" class="{{ err }}"></p>
+            </div>
+            <div class="col-span-2">
+              <label for="hs-triage" class="{{ label }}">Triage Priority</label>
+              <select id="hs-triage" name="triage_priority" class="{{ input }}">
+                <option value="">Not triaged</option>
+                {% for key, text in hospital_options.triage.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+              </select>
+              <p data-error-for="triage_priority" class="{{ err }}"></p>
+            </div>
+            <div class="col-span-2">
+              <label for="hs-complaint" class="{{ label }}">Chief Complaint</label>
+              <input id="hs-complaint" name="chief_complaint" maxlength="200" autocomplete="off" placeholder="e.g. Suspected acute stroke" class="{{ input }}">
+              <p data-error-for="chief_complaint" class="{{ err }}"></p>
+            </div>
+            {% for name, text, unit, step in [('heart_rate', 'Heart Rate', 'bpm', '1'), ('bp_systolic', 'BP Systolic', 'mmHg', '1'), ('bp_diastolic', 'BP Diastolic', 'mmHg', '1'),
+                                              ('spo2', 'SpO2', '%', '1'), ('temperature', 'Temperature', '°C', '0.1'), ('respiratory_rate', 'Resp. Rate', '/min', '1')] %}
+            <div>
+              <label for="hs-{{ name }}" class="{{ label }}">{{ text }} <span class="font-normal text-slate-400">({{ unit }})</span></label>
+              <input id="hs-{{ name }}" name="{{ name }}" type="number" step="{{ step }}" min="0" inputmode="decimal" class="{{ input }}">
+              <p data-error-for="{{ name }}" class="{{ err }}"></p>
+            </div>
+            {% endfor %}
+          </div>
+        </details>
+
+        <div class="sm:col-span-2">
+          <label for="hs-notes" class="{{ label }}"><span class="material-symbols-outlined text-brand-cyan text-[1rem]" aria-hidden="true">assignment</span>Additional Notes</label>
+          <textarea id="hs-notes" name="additional_notes" rows="4" maxlength="{{ hospital_options.notesLimit }}" aria-describedby="hs-notes-count"
+                    placeholder="Enter additional information such as vital signs, injuries, special needs, or other relevant information." class="{{ input }}"></textarea>
+          <div class="flex justify-between gap-2">
+            <p data-error-for="additional_notes" class="{{ err }}"></p>
+            <p id="hs-notes-count" class="ml-auto text-[0.6875rem] font-mono text-slate-400">0/{{ hospital_options.notesLimit }}</p>
+          </div>
+        </div>
+
+        <div class="sm:col-span-2 sticky bottom-0 -mx-4 -mb-4 px-4 py-3 rounded-b-xl bg-[#0b1220]/95 backdrop-blur border-t border-brand-borderSubtle flex flex-wrap items-center justify-between gap-2">
+          <button type="button" id="hs-clear" class="{{ ghost }}"><span class="material-symbols-outlined text-[1.125rem]" aria-hidden="true">restart_alt</span>Clear Form</button>
+          <button type="submit" id="hs-send" class="{{ primary }} min-w-[11rem]"><span class="material-symbols-outlined text-[1.125rem]" aria-hidden="true">send</span><span data-label>Send Signal</span></button>
+        </div>
+      </form>
+    </section>
+
+    <div class="lg:col-span-5 flex flex-col gap-3 min-w-0">
+      {# ------------------------------------------------ hospitals #}
+      <section class="{{ card }} p-4 min-w-0" aria-labelledby="hs-hospitals-title">
+        <div class="flex items-center justify-between gap-2">
+          <h2 id="hs-hospitals-title" class="{{ heading }}">
+            <span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">local_hospital</span>
+            Available Hospitals
+          </h2>
+          <button type="button" id="hs-hospital-add" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[0.6875rem] font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12]">
+            <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">add</span>Add Hospital
+          </button>
+        </div>
+        <p id="hs-distance-note" class="hidden mt-1 text-[0.6875rem] text-slate-400">Distances are straight-line from the selected incident's GPS position, nearest first.</p>
+        <div id="hs-hospitals" class="mt-2 flex flex-col divide-y divide-brand-borderSubtle/60 max-h-[20.625rem] overflow-y-auto -mr-2 pr-2" aria-live="polite">
+          {% for _ in range(3) %}<div class="h-12 my-1 rounded-md bg-[#141a2b] animate-pulse"></div>{% endfor %}
+        </div>
+      </section>
+
+      {# ------------------------------------------------ recent signals #}
+      <section class="{{ card }} p-4 min-w-0" aria-labelledby="hs-recent-title">
+        <div class="flex items-center justify-between gap-2">
+          <h2 id="hs-recent-title" class="{{ heading }}">
+            <span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">history</span>
+            Recent Signals
+          </h2>
+          <button type="button" id="hs-view-all" class="inline-flex items-center gap-1 text-xs font-semibold text-brand-cyan hover:underline">
+            View All <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">arrow_forward</span>
+          </button>
+        </div>
+        <div class="mt-2 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="border-b border-brand-borderSubtle"><tr>
+              {% for name in ['Time', 'Hospital', 'Type', 'Incident', 'Status'] %}<th scope="col" class="px-2 py-2 text-left font-mono text-[0.625rem] uppercase tracking-wider text-slate-400 whitespace-nowrap">{{ name }}</th>{% endfor %}
+            </tr></thead>
+            <tbody id="hs-recent" aria-live="polite"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  {# ------------------------------------------------ confirm before sending #}
+  <dialog id="hs-confirm" class="{{ dialog }} max-w-md" aria-labelledby="hs-confirm-title">
+    <div class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <h2 id="hs-confirm-title" class="px-5 py-4 border-b border-brand-borderSubtle text-base font-bold text-white">Send Hospital Signal?</h2>
+      <div class="px-5 py-4">
+        <dl id="hs-confirm-body" class="text-sm"></dl>
+        <div id="hs-confirm-warning" class="hidden mt-3 p-3 rounded-lg border border-amber-500/50 bg-amber-950/40 text-xs text-amber-100" role="alert"></div>
+        <p class="mt-3 text-xs text-slate-400">The hospital's staff are notified as soon as you send.</p>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+        <button type="button" id="hs-confirm-send" class="{{ primary }} !py-2"><span class="material-symbols-outlined text-[1.125rem]" aria-hidden="true">send</span><span data-label>Send Signal</span></button>
+      </div>
+    </div>
+  </dialog>
+
+  {# ------------------------------------------------ sent #}
+  <dialog id="hs-success" class="{{ dialog }} max-w-md" aria-labelledby="hs-success-title">
+    <div class="rounded-xl bg-[#0d1424] border border-emerald-500/40 shadow-2xl">
+      <div class="px-5 py-4 border-b border-brand-borderSubtle flex items-center gap-2">
+        <span class="material-symbols-outlined text-emerald-400" aria-hidden="true">check_circle</span>
+        <h2 id="hs-success-title" class="text-base font-bold text-white">Hospital Signal Sent</h2>
+      </div>
+      <div class="px-5 py-4">
+        <p id="hs-success-text" class="text-sm text-slate-200"></p>
+        <dl id="hs-success-body" class="mt-3 text-sm"></dl>
+        <p id="hs-success-note" class="hidden mt-3 p-3 rounded-lg border border-amber-500/50 bg-amber-950/40 text-xs text-amber-100"></p>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Close</button>
+        <button type="button" id="hs-success-view" class="{{ ghost }} !py-2">View Signal</button>
+      </div>
+    </div>
+  </dialog>
+
+  {# ------------------------------------------------ signal details #}
+  <dialog id="hs-detail" class="{{ dialog }} max-w-lg" aria-labelledby="hs-detail-title">
+    <div class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-brand-borderSubtle">
+        <h2 id="hs-detail-title" class="text-base font-bold text-white">Signal Details</h2>
+        <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      </div>
+      <div id="hs-detail-body" class="px-5 py-4 max-h-[65vh] overflow-y-auto"></div>
+      <div id="hs-detail-actions" class="flex flex-wrap justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle"></div>
+    </div>
+  </dialog>
+
+  {# ------------------------------------------------ all signals #}
+  <dialog id="hs-all" class="{{ dialog }} max-w-5xl" aria-labelledby="hs-all-title">
+    <div class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-brand-borderSubtle">
+        <h2 id="hs-all-title" class="text-base font-bold text-white">All Hospital Signals</h2>
+        <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      </div>
+      <form id="hs-all-filters" class="px-5 pt-4 flex flex-wrap items-end gap-2" role="search">
+        <label class="relative flex-1 min-w-[11.875rem]">
+          <span class="sr-only">Search signals</span>
+          <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[1rem]" aria-hidden="true">search</span>
+          <input type="search" name="q" maxlength="60" placeholder="Search HS/INC number, hospital or patient" class="w-full pl-7 {{ small }}">
+        </label>
+        <label><span class="sr-only">Status</span>
+          <select name="status" class="{{ small }}"><option value="">All statuses</option>
+            {% for key, text in hospital_options.statuses.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}</select></label>
+        <label><span class="sr-only">Hospital</span>
+          <select name="hospital_id" class="{{ small }} max-w-[12rem]"><option value="">All hospitals</option></select></label>
+        <label class="text-[0.6875rem] text-slate-300">From <input type="date" name="from" max="{{ hospital_options.today }}" class="{{ small }} [color-scheme:dark]"></label>
+        <label class="text-[0.6875rem] text-slate-300">To <input type="date" name="to" max="{{ hospital_options.today }}" class="{{ small }} [color-scheme:dark]"></label>
+        <button type="button" id="hs-all-clear" class="text-xs text-slate-300 underline pb-1.5">Clear</button>
+      </form>
+      <div class="px-5 py-3 max-h-[55vh] overflow-auto">
+        <table class="w-full text-sm">
+          <thead class="border-b border-brand-borderSubtle"><tr>
+            {% for name in ['Signal', 'Sent', 'Hospital', 'Type', 'Incident', 'Condition', 'ETA', 'Status'] %}<th scope="col" class="px-2 py-2 text-left font-mono text-[0.625rem] uppercase tracking-wider text-slate-400 whitespace-nowrap">{{ name }}</th>{% endfor %}
+          </tr></thead>
+          <tbody id="hs-all-body" aria-live="polite"></tbody>
+        </table>
+      </div>
+      <div id="hs-all-pager" class="px-5 py-3 border-t border-brand-borderSubtle flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400"></div>
+    </div>
+  </dialog>
+
+  {# ------------------------------------------------ add / edit hospital #}
+  <dialog id="hs-hospital-dialog" class="{{ dialog }} max-w-lg" aria-labelledby="hs-hospital-title">
+    <div class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-brand-borderSubtle">
+        <h2 id="hs-hospital-title" class="text-base font-bold text-white">Add Hospital</h2>
+        <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      </div>
+      <div class="max-h-[70vh] overflow-y-auto">
+        <form id="hs-hospital-form" novalidate class="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div id="hs-hospital-error" class="sm:col-span-2 hidden p-3 rounded-lg bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert"></div>
+          <div class="sm:col-span-2">
+            <label for="hsh-name" class="{{ label }}">Hospital name <span class="text-red-400">*</span></label>
+            <input id="hsh-name" name="name" maxlength="120" required class="{{ input }}">
+            <p data-error-for="name" class="{{ err }}"></p>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="hsh-address" class="{{ label }}">Address <span class="font-normal text-slate-400">(optional)</span></label>
+            <input id="hsh-address" name="address" maxlength="300" class="{{ input }}">
+            <p data-error-for="address" class="{{ err }}"></p>
+          </div>
+          <div>
+            <label for="hsh-phone" class="{{ label }}">Emergency room phone <span class="font-normal text-slate-400">(optional)</span></label>
+            <input id="hsh-phone" name="phone_number" type="tel" maxlength="25" class="{{ input }} font-mono" placeholder="+63 82 123 4567">
+            <p data-error-for="phone_number" class="{{ err }}"></p>
+          </div>
+          <div>
+            <label for="hsh-availability" class="{{ label }}">Availability</label>
+            <select id="hsh-availability" name="availability" class="{{ input }}">
+              {% for key, text in hospital_options.availability.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+            </select>
+            <p data-error-for="availability" class="{{ err }}"></p>
+          </div>
+          <div>
+            <label for="hsh-lat" class="{{ label }}">Latitude <span class="font-normal text-slate-400">(optional)</span></label>
+            <input id="hsh-lat" name="latitude" inputmode="decimal" class="{{ input }} font-mono" placeholder="7.0731">
+            <p data-error-for="latitude" class="{{ err }}"></p>
+          </div>
+          <div>
+            <label for="hsh-lng" class="{{ label }}">Longitude <span class="font-normal text-slate-400">(optional)</span></label>
+            <input id="hsh-lng" name="longitude" inputmode="decimal" class="{{ input }} font-mono" placeholder="125.6128">
+          </div>
+          <label class="sm:col-span-2 flex items-center gap-2 text-sm text-slate-200">
+            <input type="checkbox" name="is_active" checked class="w-4 h-4 accent-cyan-400"> Active (can be selected for new signals)
+          </label>
+          <div id="hs-hospital-verify" class="hidden sm:col-span-2">
+            <label class="flex items-center gap-2 text-sm text-slate-200">
+              <input type="checkbox" name="verified" checked class="w-4 h-4 accent-cyan-400"> Verified receiving hospital (patient reports may be sent to it)
+            </label>
+            <p id="hs-hospital-registered" class="hidden mt-1 p-2.5 rounded-lg border border-amber-500/50 bg-amber-950/40 text-xs text-amber-100">
+              This hospital registered itself through the Hospital Portal. Confirm it is a real receiving hospital (for example by phoning its emergency department) before ticking Verified.
+            </p>
+          </div>
+          <div class="sm:col-span-2 flex flex-wrap justify-between gap-2 pt-1">
+            <button type="button" id="hs-hospital-delete" class="hidden px-3 py-2 rounded-md text-sm text-red-300 hover:bg-red-500/10">Delete hospital</button>
+            <button type="submit" class="{{ primary }} !py-2 ml-auto">Save Hospital</button>
+          </div>
+        </form>
+        <section id="hs-staff" class="hidden px-5 pb-5 border-t border-brand-borderSubtle pt-4">
+          <h3 class="text-sm font-bold text-white">Staff accounts that receive this hospital's signals</h3>
+          <p class="text-[0.6875rem] text-slate-400 mt-0.5">Add the email of an existing ESRMS account. That person then sees this hospital's signals at <span class="font-mono">/hospital</span> after signing in.</p>
+          <ul id="hs-staff-list" class="mt-2 flex flex-col gap-1"></ul>
+          <form id="hs-staff-form" novalidate class="mt-2 flex gap-2">
+            <input name="email" type="email" maxlength="254" placeholder="staff.member@hospital.example" aria-label="Staff account email" class="{{ input }}">
+            <button type="submit" class="{{ ghost }} !py-2 whitespace-nowrap">Add staff</button>
+          </form>
+          <p id="hs-staff-error" class="{{ err }}" role="alert"></p>
+        </section>
+      </div>
+    </div>
+  </dialog>
+</div>

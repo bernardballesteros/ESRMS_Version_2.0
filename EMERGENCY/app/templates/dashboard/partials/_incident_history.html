@@ -1,0 +1,77 @@
+{# Incident & Signal History tab: a two-tab archive. Incident Reports = archived (resolved/cancelled) incidents and their
+   status history (static/js/dispatch.js). Signal History = hospital signals archived from the Hospital Signal tab,
+   read from the same hospital_signals records (static/js/signal-archive.js). #}
+{% set field = "px-3 py-2 rounded-md bg-[#0a1020] border border-brand-borderSubtle text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-cyan" %}
+{% set subtab = "flex items-center gap-2 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider whitespace-nowrap border-b-2 transition-colors aria-selected:text-brand-cyan aria-selected:border-brand-cyan aria-selected:bg-brand-cyan/5 text-slate-400 border-transparent hover:text-slate-200" %}
+<div id="incident-archive" class="esrms-focus max-w-6xl mx-auto px-4 py-6">
+  <div class="mb-3">
+    <p class="font-mono text-[0.6875rem] text-brand-cyan tracking-widest uppercase">Incident &amp; Signal History</p>
+    <h2 class="text-xl font-bold text-white">Incident History</h2>
+    <p class="text-xs text-slate-400 mt-0.5">Resolved and cancelled incidents archived from the Dispatch Center.</p>
+  </div>
+
+  <div role="tablist" aria-label="Incident and signal history" class="flex items-center gap-1 overflow-x-auto border-b border-brand-borderSubtle mb-4">
+    <button type="button" role="tab" id="archive-tab-incidents" data-archive-tab="incidents" aria-selected="true" aria-controls="archive-panel-incidents" class="{{ subtab }}">
+      <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">description</span>Incident Reports
+    </button>
+    <button type="button" role="tab" id="archive-tab-signals" data-archive-tab="signals" aria-selected="false" aria-controls="archive-panel-signals" class="{{ subtab }}">
+      <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">medical_services</span>Signal History
+    </button>
+  </div>
+
+  {# ------------------------------------------------ incident reports (existing history) #}
+  <div id="archive-panel-incidents" role="tabpanel" aria-labelledby="archive-tab-incidents" data-archive-panel="incidents">
+    <form id="history-filters" class="flex flex-wrap gap-2 mb-3" role="search">
+      <input type="search" name="q" placeholder="Search INC-ID, type, description" aria-label="Search archived incidents"
+             class="w-64 max-w-full {{ field }}">
+      <select name="status" aria-label="Outcome" class="{{ field }}">
+        <option value="">All outcomes</option><option value="resolved">Resolved</option><option value="cancelled">Cancelled</option>
+      </select>
+    </form>
+    <div id="history-list" class="rounded-lg border border-brand-border bg-brand-card overflow-x-auto" aria-live="polite">
+      <p class="p-6 text-sm text-slate-400">Open this tab to load the incident history.</p>
+    </div>
+  </div>
+
+  {# ------------------------------------------------ signal history #}
+  <div id="archive-panel-signals" role="tabpanel" aria-labelledby="archive-tab-signals" data-archive-panel="signals" class="hidden">
+    {% if can_dispatch %}
+    <form id="signal-archive-filters" class="flex flex-wrap gap-2 mb-3" role="search">
+      <input type="search" name="q" maxlength="60" placeholder="Search signal ID, hospital, incident..." aria-label="Search signals"
+             class="w-72 max-w-full {{ field }}">
+      <select name="filter" aria-label="Signal filter" class="{{ field }}">
+        <option value="">All Signals</option>
+        {% for key, text in hospital_options.archiveFilters.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+      </select>
+    </form>
+    <div class="rounded-lg border border-brand-border bg-brand-card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="border-b border-brand-borderSubtle"><tr>
+          {% for name in ['Signal ID', 'Signal Type', 'Hospital', 'Incident', 'Priority', 'Status', 'Sent', 'Archived', 'Action'] %}<th scope="col" class="px-3 py-2 text-left font-mono text-[0.625rem] uppercase tracking-wider text-slate-400 whitespace-nowrap">{{ name }}</th>{% endfor %}
+        </tr></thead>
+        <tbody id="signal-archive-body" aria-live="polite">
+          <tr><td colspan="9" class="p-6 text-sm text-slate-400">Open this tab to load the signal history.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="signal-archive-more" class="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400"></div>
+
+    {% else %}
+    <p class="p-6 rounded-lg border border-brand-border bg-brand-card text-sm text-slate-400">Your account cannot view hospital signals.</p>
+    {% endif %}
+  </div>
+
+  {# Outside the panels: the incident timeline opens it too. #}
+  {% if can_dispatch %}
+  <dialog id="signal-archive-detail" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-2xl text-slate-100" aria-labelledby="signal-archive-title">
+    <div class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-brand-borderSubtle">
+        <h2 id="signal-archive-title" class="text-base font-bold text-white">Signal Details</h2>
+        <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
+      </div>
+      <div id="signal-archive-detail-body" tabindex="0" role="group" aria-labelledby="signal-archive-title" class="px-5 py-4 max-h-[68vh] overflow-y-auto"></div>
+      <div id="signal-archive-detail-actions" class="flex flex-wrap justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle"></div>
+    </div>
+  </dialog>
+  {% endif %}
+</div>

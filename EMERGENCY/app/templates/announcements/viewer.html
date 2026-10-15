@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Public Announcements{% endblock %}
+{% block tailwind_theme %}
+<script src="{{ url_for('static', filename='js/tailwind.dashboard.js') }}"></script>
+{% endblock %}
+{% block body_class %}bg-[#070b14] text-slate-100 font-sans min-h-screen antialiased{% endblock %}
+
+{% block header %}
+<header class="w-full border-b border-white/[0.07] bg-[#0a0f1c]">
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="{{ url_for('main.index') }}" class="flex items-center gap-2">
+      <img src="{{ url_for('static', filename='img/emblem.svg') }}" alt="" class="w-8 h-8">
+      <span class="font-extrabold tracking-wider text-white">ESRMS</span>
+    </a>
+    <nav class="flex items-center gap-4 text-sm">
+      {% if can_manage_announcements %}<a href="{{ url_for('announcements.manage') }}" class="text-slate-300 hover:text-white">Manage</a>{% endif %}
+      {% if current_user %}
+      <a href="{{ url_for('main.dashboard') }}" class="text-slate-300 hover:text-white">Dashboard</a>
+      {% else %}
+      <a href="{{ url_for('auth.login', role='citizen') }}" class="text-slate-300 hover:text-white">Sign in</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<main id="ann-viewer" class="flex-1 w-full max-w-4xl mx-auto px-4 py-6"
+      data-api="{{ url_for('announcements.public_announcements') }}"
+      data-account-barangay="{{ account_barangay or '' }}">
+  <script type="application/json" id="ann-viewer-config">{{ {'realtime': realtime, 'categories': categories, 'priorities': priorities} | tojson }}</script>
+
+  <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-red-500 text-[2.5rem] -rotate-12" aria-hidden="true">campaign</span>
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Citizen Announcements</h1>
+        <p class="text-sm text-slate-400">Official advisories from your 911 emergency response organization.</p>
+      </div>
+    </div>
+    <span id="ann-live" class="flex items-center gap-1.5 text-xs text-slate-400">
+      <span class="w-2 h-2 rounded-full bg-slate-500"></span><span>Connecting…</span>
+    </span>
+  </div>
+
+  <form id="ann-barangay-form" class="flex flex-wrap items-center gap-2 mb-6 rounded-xl bg-[#0f1729]/90 border border-white/[0.07] p-3">
+    <label for="ann-barangay" class="flex items-center gap-1.5 text-sm text-slate-300">
+      <span class="material-symbols-outlined text-[1.25rem] text-slate-400" aria-hidden="true">location_on</span>Your barangay
+    </label>
+    {% if account_barangay %}
+    <span class="text-sm font-semibold text-white">{{ account_barangay }}</span>
+    <span class="text-xs text-slate-500">(from your account)</span>
+    {% else %}
+    <input id="ann-barangay" name="barangay" maxlength="100" placeholder="e.g. Poblacion"
+           class="flex-1 min-w-[10rem] px-3 py-2 rounded-lg bg-[#0a1020] border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+    <button class="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-white">Show local alerts</button>
+    <span class="w-full text-[0.6875rem] text-slate-500">Announcements for all citizens always show. Add your barangay to also see local ones.</span>
+    {% endif %}
+  </form>
+
+  <div id="ann-viewer-list" class="flex flex-col gap-4" aria-live="polite" aria-busy="true">
+    {% for _ in range(3) %}<div class="h-32 rounded-2xl bg-[#0f1729] border border-white/[0.07] animate-pulse"></div>{% endfor %}
+  </div>
+  <p id="ann-updated" class="text-[0.6875rem] text-slate-500 text-center mt-6"></p>
+</main>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="{{ url_for('static', filename='js/announcements-realtime.js') }}"></script>
+<script src="{{ url_for('static', filename='js/announcements-viewer.js') }}"></script>
+{% endblock %}

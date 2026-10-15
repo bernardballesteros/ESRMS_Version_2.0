@@ -1,0 +1,7 @@
+{
+  "supabase_url": "https://YOUR-PROJECT-REF.supabase.co",
+  "supabase_anon_key": "YOUR-ANON-PUBLIC-KEY",
+  "emergency_hotline": "911",
+  "sos_sms_number": "",
+  "gps_timeout_seconds": 30
+}

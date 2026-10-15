@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Admin Portal{% endblock %}
+{% block background %}
+<div class="fixed inset-0 bg-grid-tech pointer-events-none opacity-40"></div>
+<div class="fixed inset-0 ambient-radial pointer-events-none"></div>
+{% endblock %}
+
+{% block content %}
+<main class="relative z-10 w-full max-w-6xl mx-auto px-4 py-8 flex-1">
+  <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+    <div>
+      <p class="text-[0.6875rem] font-mono text-cyanAccent tracking-wider mb-1">ESRMS SYSTEM ADMINISTRATION</p>
+      <h1 class="text-2xl font-bold text-white tracking-tight">Admin Portal</h1>
+      <p class="text-sm text-textMuted mt-1">Signed in as {{ current_user.email }}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{{ url_for('main.dispatch_center') }}" class="px-4 py-2 rounded-[10px] border border-cyan-500/40 hover:border-cyan-400 text-sm font-semibold text-white">Dispatch Center</a>
+      <a href="{{ url_for('announcements.manage') }}" class="px-4 py-2 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-sm font-semibold text-white">Announcements</a>
+      <a href="{{ url_for('account.settings', section='agency') }}" class="px-4 py-2 rounded-[10px] border border-gray-700 hover:border-cyan-500/50 text-sm text-white">Agencies</a>
+      <a href="{{ url_for('account.settings', section='security') }}" class="px-4 py-2 rounded-[10px] border border-gray-700 hover:border-cyan-500/50 text-sm text-white">My account</a>
+      <a href="{{ url_for('auth.logout') }}" class="px-4 py-2 rounded-[10px] border border-gray-700 hover:border-cyan-500/50 text-sm text-white">Sign out</a>
+    </div>
+  </div>
+
+  {% include "partials/_flashes.html" %}
+
+  {# Stats #}
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+    {% for label, key in [('Total', 'total'), ('Citizens', 'citizen'), ('Responders', 'responder'), ('Organizations', 'organization'), ('Admins', 'admin'), ('Suspended', 'banned')] %}
+    <div class="rounded-[14px] p-4 bg-[#0D1420]/90 border border-cyan-500/20">
+      <p class="text-[0.625rem] font-mono text-textMuted tracking-wider uppercase">{{ label }}</p>
+      <p class="text-2xl font-bold text-white mt-1">{{ stats[key] }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# MFA reset requests: created by a locked-out user after their password was verified. #}
+  {% if reset_requests %}
+  <section class="rounded-[20px] bg-[#0D1420]/90 border border-amber-500/40 p-5 mb-6" aria-labelledby="mfa-resets-title">
+    <h2 id="mfa-resets-title" class="text-sm font-bold text-white">MFA reset requests ({{ reset_requests|length }})</h2>
+    <p class="text-xs text-textMuted mt-1">Each person below passed their password check and says they lost their authenticator. Verify their identity yourself (call a known number or meet in person), ask them to read out the reference code shown on their screen, and record how you verified them. Never reset on an email request alone.</p>
+    <div class="mt-4 space-y-4">
+      {% for r in reset_requests %}
+      <div class="rounded-[12px] border border-gray-800 p-4">
+        <div class="flex flex-wrap justify-between gap-2">
+          <div>
+            <p class="text-white font-medium text-sm">{{ r.name }}</p>
+            <p class="text-xs text-textMuted">{{ r.email }} · requested {{ r.created }} UTC{% if r.attempts %} · {{ r.attempts }} wrong code attempt(s){% endif %}</p>
+          </div>
+          <form method="post" action="{{ url_for('admin.reject_mfa_reset', request_id=r.id) }}">
+            <button class="px-2.5 py-1 rounded-md border border-gray-700 hover:border-red-500/60 text-xs text-white">Reject</button>
+          </form>
+        </div>
+        {% if r.user_id == current_user.id %}
+        <p class="text-xs text-amber-300 mt-3">This is your own account. Another administrator has to approve it.</p>
+        {% else %}
+        <form method="post" action="{{ url_for('admin.approve_mfa_reset', request_id=r.id) }}" class="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
+          <label class="sr-only" for="code-{{ r.id }}">Reference code read out by the user</label>
+          <input id="code-{{ r.id }}" name="code" required autocomplete="off" spellcheck="false" placeholder="Reference code (XXXX-XXXX)"
+                 class="px-2.5 py-1.5 rounded-md bg-[#070D18] border border-cyan-500/20 text-xs text-white font-mono uppercase focus:outline-none focus:border-cyan-400">
+          <label class="sr-only" for="note-{{ r.id }}">How you verified their identity</label>
+          <input id="note-{{ r.id }}" name="identity_note" required minlength="10" maxlength="500" placeholder="How you verified their identity"
+                 class="sm:col-span-2 px-2.5 py-1.5 rounded-md bg-[#070D18] border border-cyan-500/20 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <div class="flex gap-2">
+            <label class="sr-only" for="confirm-{{ r.id }}">Type RESET to confirm</label>
+            <input id="confirm-{{ r.id }}" name="confirm" required autocomplete="off" placeholder="Type RESET" pattern="RESET"
+                   class="w-28 px-2.5 py-1.5 rounded-md bg-[#070D18] border border-red-500/30 text-xs text-white font-mono focus:outline-none focus:border-red-400">
+            <button class="flex-1 py-1.5 rounded-md bg-red-600 hover:bg-red-500 text-white font-semibold text-xs">Reset MFA</button>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# Filters #}
+  <form method="get" class="flex flex-wrap gap-2 mb-4">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search name or email"
+           class="flex-1 min-w-[12.5rem] px-3 py-2 rounded-[10px] bg-[#070D18] border border-cyan-500/20 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400">
+    <select name="role" class="px-3 py-2 rounded-[10px] bg-[#070D18] border border-cyan-500/20 text-sm text-white">
+      <option value="">All roles</option>
+      {% for r in roles %}<option value="{{ r }}" {% if r == role %}selected{% endif %}>{{ r|capitalize }}</option>{% endfor %}
+    </select>
+    <button class="px-4 py-2 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] text-[#050A12] font-semibold text-sm">Filter</button>
+  </form>
+
+  {# Users #}
+  <div class="rounded-[20px] bg-[#0D1420]/90 border border-cyan-500/25 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-[0.625rem] font-mono text-textMuted uppercase tracking-wider border-b border-cyan-500/10">
+        <tr>
+          <th class="text-left px-4 py-3">User</th>
+          <th class="text-left px-4 py-3">Role</th>
+          <th class="text-left px-4 py-3">Status</th>
+          <th class="text-left px-4 py-3">Created</th>
+          <th class="text-left px-4 py-3">Last sign-in</th>
+          <th class="text-right px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in rows %}
+        <tr class="border-b border-gray-800/60 last:border-0">
+          <td class="px-4 py-3">
+            <div class="text-white font-medium">{{ u.name }}</div>
+            <div class="text-xs text-textMuted">{{ u.email }}{% if u.agency %} · {{ u.agency }}{% endif %}</div>
+          </td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded font-mono text-[0.6875rem] bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">{{ u.role|upper }}</span></td>
+          <td class="px-4 py-3 text-xs">
+            {% if u.banned %}<span class="text-red-400">Suspended</span>
+            {% elif not u.confirmed %}<span class="text-amber-400">Unconfirmed</span>
+            {% else %}<span class="text-emerald-400">Active</span>{% endif %}
+          </td>
+          <td class="px-4 py-3 text-xs text-textMuted">{{ u.created_at }}</td>
+          <td class="px-4 py-3 text-xs text-textMuted">{{ u.last_sign_in }}</td>
+          <td class="px-4 py-3">
+            {% if u.id != current_user.id %}
+            <div class="flex justify-end gap-1.5 flex-wrap">
+              {% if u.banned %}
+              <form method="post" action="{{ url_for('admin.reinstate', user_id=u.id) }}"><button class="px-2.5 py-1 rounded-md border border-gray-700 hover:border-emerald-500/60 text-xs text-white">Reinstate</button></form>
+              {% else %}
+              <form method="post" action="{{ url_for('admin.suspend', user_id=u.id) }}"><button class="px-2.5 py-1 rounded-md border border-gray-700 hover:border-amber-500/60 text-xs text-white">Suspend</button></form>
+              {% endif %}
+              {% if u.role == 'admin' %}
+              <form method="post" action="{{ url_for('admin.demote', user_id=u.id) }}"><button class="px-2.5 py-1 rounded-md border border-gray-700 hover:border-cyan-500/60 text-xs text-white">Remove admin</button></form>
+              {% else %}
+              <form method="post" action="{{ url_for('admin.promote', user_id=u.id) }}" onsubmit="return confirm('Grant admin access to {{ u.email }}?')"><button class="px-2.5 py-1 rounded-md border border-gray-700 hover:border-cyan-500/60 text-xs text-white">Make admin</button></form>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin.send_reset', user_id=u.id) }}" onsubmit="return confirm('Email a password reset link to {{ u.email }}?')"><button class="px-2.5 py-1 rounded-md border border-gray-700 hover:border-cyan-500/60 text-xs text-white">Send reset email</button></form>
+              <details class="relative">
+                <summary class="list-none cursor-pointer px-2.5 py-1 rounded-md border border-gray-700 hover:border-cyan-500/60 text-xs text-white">Set password</summary>
+                <form method="post" action="{{ url_for('admin.set_password', user_id=u.id) }}" class="absolute right-0 z-20 mt-1 w-64 p-3 space-y-2 rounded-[10px] bg-[#0D1420] border border-cyan-500/30 shadow-xl">
+                  <p class="text-[0.6875rem] text-textMuted">New password for {{ u.email }}{% if u.role == 'organization' %} (min 16){% elif u.role == 'responder' %} (min 12){% else %} (min 8){% endif %}</p>
+                  <input type="password" name="password" required autocomplete="new-password" placeholder="New password"
+                         class="w-full px-2.5 py-1.5 rounded-md bg-[#070D18] border border-cyan-500/20 text-xs text-white focus:outline-none focus:border-cyan-400">
+                  <input type="password" name="confirm_password" required autocomplete="new-password" placeholder="Confirm password"
+                         class="w-full px-2.5 py-1.5 rounded-md bg-[#070D18] border border-cyan-500/20 text-xs text-white focus:outline-none focus:border-cyan-400">
+                  <button class="w-full py-1.5 rounded-md bg-gradient-to-r from-[#00D9FF] to-[#1685FF] text-[#050A12] font-semibold text-xs">Save password</button>
+                </form>
+              </details>
+              <details class="relative">
+                <summary class="list-none cursor-pointer px-2.5 py-1 rounded-md border border-red-900 hover:border-red-500 text-xs text-red-300">Delete</summary>
+                <form method="post" action="{{ url_for('admin.delete', user_id=u.id) }}" class="absolute right-0 z-20 mt-1 w-64 p-3 space-y-2 rounded-[10px] bg-[#0D1420] border border-red-500/40 shadow-xl text-left">
+                  <p class="text-[0.6875rem] text-textMuted">Permanently delete {{ u.email }}? This cannot be undone. Type <span class="font-mono text-red-300">DELETE</span> to confirm.</p>
+                  <input type="text" name="confirm" required autocomplete="off" spellcheck="false" placeholder="DELETE" pattern="DELETE" title="Type DELETE in capital letters"
+                         oninput="this.form.querySelector('button').disabled = this.value !== 'DELETE'"
+                         class="w-full px-2.5 py-1.5 rounded-md bg-[#070D18] border border-red-500/30 text-xs text-white font-mono focus:outline-none focus:border-red-400">
+                  <button disabled class="w-full py-1.5 rounded-md bg-red-600 hover:bg-red-500 text-white font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed">Delete account</button>
+                </form>
+              </details>
+            </div>
+            {% else %}<p class="text-right text-[0.6875rem] font-mono text-textMuted">YOU</p>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="px-4 py-10 text-center text-sm text-textMuted">No users found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex justify-between mt-4 text-xs font-mono">
+    {% if page > 1 %}<a class="text-cyanAccent hover:underline" href="{{ url_for('admin.index', page=page-1, role=role, q=q) }}">← PREV</a>{% else %}<span></span>{% endif %}
+    <span class="text-textMuted">PAGE {{ page }}</span>
+    {% if has_next %}<a class="text-cyanAccent hover:underline" href="{{ url_for('admin.index', page=page+1, role=role, q=q) }}">NEXT →</a>{% else %}<span></span>{% endif %}
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% from "account/_macros.html" import input, label, card, primary, secondary, outline, field, form_error %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <section class="{{ card }} p-5 text-center" aria-label="Account summary">
+    <div class="relative w-24 h-24 mx-auto">
+      <span id="profile-avatar" data-avatar class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-tr from-brand-cyan/20 to-brand-cyan/80 border-2 border-brand-cyan flex items-center justify-center font-mono text-2xl font-bold text-black shadow-[0_0_18px_rgba(0,229,255,0.35)]"></span>
+    </div>
+    <p id="profile-name" class="text-base font-bold text-white mt-3 break-words"></p>
+    <p id="profile-email" class="text-xs text-slate-400 break-all"></p>
+    <p id="profile-role" class="text-xs text-slate-300 mt-2"></p>
+    <p id="profile-agency" class="text-xs text-slate-400"></p>
+
+    <dl class="mt-4 pt-4 border-t border-brand-borderSubtle text-xs space-y-2">
+      <div><dt class="text-slate-500">Account Status</dt><dd id="profile-status" class="font-semibold mt-0.5"></dd></div>
+      <div><dt class="text-slate-500">Member Since</dt><dd id="profile-since" class="text-slate-300 mt-0.5"></dd></div>
+    </dl>
+
+    <input id="avatar-file" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" aria-label="Choose a profile photo">
+    <div class="mt-4 flex flex-wrap justify-center gap-2">
+      <button type="button" id="avatar-change" class="{{ outline }} !text-xs">Change Photo</button>
+      <button type="button" id="avatar-remove" class="hidden px-3 py-2 rounded-md text-xs text-slate-300 hover:bg-white/10">Remove</button>
+    </div>
+    <p class="text-[0.6875rem] text-slate-500 mt-2">PNG, JPEG or WebP, up to 2 MB.</p>
+  </section>
+
+  <section class="{{ card }} lg:col-span-2" aria-labelledby="profile-form-title">
+    <form id="profile-form" novalidate>
+      <div class="px-5 py-4 border-b border-brand-borderSubtle">
+        <h2 id="profile-form-title" class="text-sm font-bold text-white">Personal Information</h2>
+      </div>
+      <div class="px-5 py-4 space-y-4">
+        {{ form_error('profile-form-error') }}
+        {{ field('pf-name', 'full_name', 'Full Name', required=true, maxlength=120, attrs='autocomplete="name"') }}
+        {{ field('pf-email', 'email', 'Email Address', required=true, type='email', maxlength=254, attrs='autocomplete="email"') }}
+        <p id="profile-email-note" class="hidden text-xs text-amber-300 -mt-2" role="status"></p>
+        {{ field('pf-phone', 'phone', 'Phone Number', type='tel', maxlength=32, attrs='autocomplete="tel" placeholder="+63 912 345 6789"') }}
+        <div>
+          <label for="pf-role" class="{{ label }}">Position / Role</label>
+          <input id="pf-role" disabled class="{{ input }}" aria-describedby="pf-role-hint">
+          <p id="pf-role-hint" class="text-[0.6875rem] text-slate-500 mt-1">Your role is assigned by ESRMS administrators and can't be changed here.</p>
+        </div>
+        <div>
+          <label for="pf-agency" class="{{ label }}">Agency</label>
+          <input id="pf-agency" disabled class="{{ input }}">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" data-cancel class="{{ secondary }}">Cancel</button>
+        <button type="submit" class="{{ primary }}">Save Changes</button>
+      </div>
+    </form>
+  </section>
+</div>

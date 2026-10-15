@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block background %}
+<div class="fixed inset-0 bg-grid-tech pointer-events-none opacity-40"></div>
+<div class="fixed inset-0 ambient-radial pointer-events-none"></div>
+{% endblock %}
+
+{% block content %}
+<main class="relative z-10 w-full max-w-3xl mx-auto px-4 py-12 flex-1 flex items-center justify-center">
+  <div class="w-full rounded-[20px] p-8 bg-[#0D1420]/90 border border-cyan-500/25 cyan-glow">
+    {% include "partials/_flashes.html" %}
+    <p class="text-[0.6875rem] font-mono text-cyanAccent tracking-wider mb-2">
+      {{ 'ORGANIZATION / 911 DISPATCH CONSOLE' if current_user.role == 'organization' else 'RESPONDER FIELD TERMINAL' }}
+    </p>
+    <h1 class="text-2xl font-bold text-white tracking-tight">Welcome, {{ current_user.name }}</h1>
+    <p class="text-sm text-textMuted mt-1">Signed in as {{ current_user.email }}</p>
+    <p class="text-xs text-textMuted mt-6">This dashboard is a placeholder. Build the {{ current_user.role or 'user' }} views here.</p>
+    <a href="{{ url_for('announcements.viewer') }}" class="inline-block mt-6 mr-2 px-4 py-2 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-sm font-semibold text-white">View announcements</a>
+    <a href="{{ url_for('account.settings', section='profile') }}" class="inline-block mt-6 mr-2 px-4 py-2 rounded-[10px] border border-gray-700 hover:border-cyan-500/50 text-sm text-white">Account settings</a>
+    <a href="{{ url_for('auth.logout') }}" class="inline-block mt-6 px-4 py-2 rounded-[10px] border border-gray-700 hover:border-cyan-500/50 text-sm text-white">Sign out</a>
+  </div>
+</main>
+{% endblock %}

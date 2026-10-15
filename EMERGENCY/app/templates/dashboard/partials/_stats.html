@@ -1,0 +1,21 @@
+{% set stats = [
+  ('Active Incidents', 'active', 'border-brand-cyan/50 bg-[#141d2f]', 'bg-brand-cyan animate-pulse', 'text-brand-cyan bg-brand-cyan/10'),
+] %}
+<section class="bg-[#0b101c] px-4 py-2 border-b border-brand-borderSubtle flex flex-wrap items-center justify-between gap-3 shrink-0">
+  <div class="flex items-center gap-3">
+    <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-white uppercase">Dispatch Center</h1>
+    <span class="text-xs font-mono text-slate-400 hidden sm:inline-block px-2 py-0.5 rounded bg-slate-800/80 border border-slate-700">
+      {{ (current_user.jurisdiction or 'Metro PSAP Sector 04')|upper }}
+    </span>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    {# Values come from /api/dispatch/incidents (see dispatch.js); "–" until loaded. #}
+    {% for label, key, box, dot, pill in stats %}
+    <div class="px-3 py-1.5 rounded-lg border {{ box }} flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full {{ dot }}"></span>
+      <span class="text-xs font-mono font-semibold text-slate-200 whitespace-nowrap">{{ label }}</span>
+      <span data-dispatch-count="{{ key }}" class="text-xs font-mono font-bold px-1.5 rounded {{ pill }}">–</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>

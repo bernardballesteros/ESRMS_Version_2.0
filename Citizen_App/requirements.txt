@@ -1,0 +1,7 @@
+flet[all]==1.0.3
+flet-geolocator==1.0.3
+flet-permission-handler==1.0.3
+flet-camera==1.0.3
+httpx>=0.28
+websockets>=13
+pytest>=8

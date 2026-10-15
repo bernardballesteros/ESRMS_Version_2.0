@@ -1,0 +1,47 @@
+{# Shared styles and controls for the account settings sections. #}
+{% set input = "w-full px-3 py-2 rounded-md bg-[#0a1020] border border-brand-borderSubtle text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/40 disabled:bg-white/5 disabled:text-slate-400 disabled:cursor-not-allowed read-only:bg-white/5 read-only:text-slate-400" %}
+{% set label = "block text-xs font-semibold text-slate-300 mb-1" %}
+{% set card = "rounded-lg bg-brand-card border border-brand-border" %}
+{% set primary = "px-4 py-2 rounded-md text-sm font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12] disabled:opacity-60 disabled:cursor-wait" %}
+{% set secondary = "px-4 py-2 rounded-md text-sm border border-slate-600 text-slate-200 hover:bg-white/5" %}
+{% set outline = "px-4 py-2 rounded-md text-sm font-semibold border border-brand-cyan/50 text-brand-cyan hover:bg-brand-cyan/10 disabled:opacity-50 disabled:cursor-not-allowed" %}
+
+{% macro field(id, name, text, required=false, type='text', maxlength=none, attrs='', hint=none) %}
+<div>
+  <label for="{{ id }}" class="{{ label }}">{{ text }}{% if required %} <span class="text-red-400" aria-hidden="true">*</span>{% endif %}</label>
+  <input id="{{ id }}" name="{{ name }}" type="{{ type }}" {% if maxlength %}maxlength="{{ maxlength }}"{% endif %} {% if required %}required aria-required="true"{% endif %} aria-describedby="{{ id }}-error" class="{{ input }}" {{ attrs|safe }}>
+  {% if hint %}<p class="text-[0.6875rem] text-slate-500 mt-1">{{ hint }}</p>{% endif %}
+  <p id="{{ id }}-error" data-error-for="{{ name }}" class="hidden text-xs text-red-400 mt-1"></p>
+</div>
+{% endmacro %}
+
+{% macro password(id, name, text, autocomplete) %}
+<div>
+  <label for="{{ id }}" class="{{ label }}">{{ text }} <span class="text-red-400" aria-hidden="true">*</span></label>
+  <div class="relative">
+    <input id="{{ id }}" name="{{ name }}" type="password" required aria-required="true" maxlength="72" autocomplete="{{ autocomplete }}" aria-describedby="{{ id }}-error" class="{{ input }} pr-10">
+    <button type="button" data-toggle-password="{{ id }}" aria-label="Show or hide {{ text|lower }}"
+            class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-brand-cyan focus:outline-none focus-visible:text-brand-cyan">
+      <svg data-eye="open" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      <svg data-eye="closed" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+    </button>
+  </div>
+  <p id="{{ id }}-error" data-error-for="{{ name }}" class="hidden text-xs text-red-400 mt-1"></p>
+</div>
+{% endmacro %}
+
+{% macro switch(name, text, description, icon=none, disabled=false) %}
+<label class="flex items-center gap-3 py-2.5 {{ 'opacity-60' if disabled else 'cursor-pointer' }}">
+  {% if icon %}<span class="material-symbols-outlined text-[1.375rem] text-brand-cyan shrink-0" aria-hidden="true">{{ icon }}</span>{% endif %}
+  <span class="min-w-0 flex-1">
+    <span class="block text-sm font-semibold text-white">{{ text }}</span>
+    <span class="block text-xs text-slate-400">{{ description }}</span>
+  </span>
+  <input type="checkbox" role="switch" name="{{ name }}" {% if disabled %}disabled{% endif %} class="peer sr-only">
+  <span aria-hidden="true" class="relative shrink-0 w-10 h-5 rounded-full bg-slate-700 transition peer-checked:bg-brand-cyan peer-focus-visible:ring-2 peer-focus-visible:ring-brand-cyan peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#0f1422] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-5"></span>
+</label>
+{% endmacro %}
+
+{% macro form_error(id) %}
+<div id="{{ id }}" data-form-error tabindex="-1" class="hidden p-3 rounded-md bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert"></div>
+{% endmacro %}

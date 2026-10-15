@@ -1,0 +1,21 @@
+{# Radar emblem used on the portal and login screens. #}
+<div class="relative group">
+  <div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-[28px] opacity-25 blur-lg group-hover:opacity-45 transition duration-500"></div>
+  <div class="relative w-[9.375rem] h-[9.375rem] rounded-[22px] bg-[#0c1422] border border-cyan-400/40 p-3 flex items-center justify-center shadow-2xl cyan-glow overflow-hidden">
+    <div class="absolute inset-0 opacity-15">
+      <div class="absolute inset-2 rounded-full border border-cyan-300"></div>
+      <div class="absolute inset-8 rounded-full border border-cyan-300"></div>
+      <div class="absolute top-0 bottom-0 left-1/2 w-[0.0625rem] bg-cyan-300"></div>
+      <div class="absolute left-0 right-0 top-1/2 h-[0.0625rem] bg-cyan-300"></div>
+    </div>
+    <div class="absolute inset-0 rounded-[22px] pointer-events-none opacity-20 radar-sweep" style="background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(0,217,255,0.7) 360deg);"></div>
+    <svg class="w-24 h-24 relative z-10 drop-shadow-[0_0_12px_rgba(0,217,255,0.8)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="42" stroke="#00D9FF" stroke-width="1.8" stroke-dasharray="5 3" opacity="0.6"/>
+      <circle cx="50" cy="50" r="33" stroke="#1685FF" stroke-width="2" opacity="0.4"/>
+      <path d="M50 10V18M50 82V90M10 50H18M82 50H90" stroke="#00D9FF" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="50" cy="50" r="22" fill="#08101C" stroke="#00D9FF" stroke-width="2.5"/>
+      <path d="M34 50H40L44 38L50 62L56 46L60 50H66" stroke="#00D9FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="50" cy="27" r="3" fill="#00D9FF" class="pulse-ring"/>
+    </svg>
+  </div>
+</div>

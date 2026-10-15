@@ -1,0 +1,236 @@
+<!DOCTYPE html><html class="h-full bg-[#06090f]" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aegis Critical Response | Portal Access</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            tactical: {
+              950: '#06090f',
+              900: '#0a0e17',
+              850: '#0f1523',
+              800: '#141d2f',
+              700: '#1e2b45',
+              cyan: '#00e5ff',
+              cyanGlow: 'rgba(0, 229, 255, 0.15)',
+              blueAccent: '#0052cc',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="ambient-lighting-and-grid">
+    /* Subtle tactical grid backdrop */
+    .tactical-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+    /* Subtle radial glow centering on the portal */
+    .center-glow {
+      background: radial-gradient(circle at 50% 45%, rgba(0, 229, 255, 0.08) 0%, rgba(0, 82, 204, 0.03) 40%, transparent 70%);
+    }
+  </style>
+<style data-purpose="tactical-interactivity">
+    /* Smooth interactive transitions for action cards */
+    .action-pill {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .action-pill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -10px rgba(0, 229, 255, 0.25);
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="h-full text-slate-100 font-sans tactical-grid center-glow flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+<!-- BEGIN: TelemetryHeader -->
+<header class="w-full px-6 py-4 flex justify-between items-center text-xs font-mono tracking-wider text-slate-400 select-none z-10" data-purpose="system-telemetry-header">
+<div class="flex items-center space-x-3">
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<span class="text-slate-300 font-semibold">ESRMS CORE v4.8.2</span>
+<span class="hidden sm:inline-block text-slate-600">|</span>
+<span class="hidden sm:inline-block text-slate-400">NODE ID: PAC-WEST-911</span>
+</div>
+<div class="flex items-center space-x-4">
+<span class="hidden md:inline-block text-slate-500">SEC-LEVEL: DEFCON 4 (ACTIVE ROUTING)</span>
+<div class="bg-tactical-850 border border-slate-700/60 rounded px-2.5 py-1 text-slate-300">
+<span class="text-cyan-400 font-medium" id="live-clock">UTC 03:56:13</span>
+</div>
+</div>
+</header>
+<!-- END: TelemetryHeader -->
+<!-- BEGIN: MainPortalContainer -->
+<!-- Strict adherence to wireframe https://lh3.googleusercontent.com/aida-public/AB6AXuB01DMqHJmyPLfCjN-ntLwETlucuANP_DQrK-GBPeGHXzg5pamOB_RPizYwcy6M8MFVrOkIGcwcnrNV5Ny-UGiDafpuek-iSHgKOi9uIMsDrXGUY3o2GDWq9d3efyv6vmrNPvpxutlmKmQqqCgXrCtgVkKIv95oHd51GaPiAI6HKLEfnwgRcKJkoZ5qbzb1mGHGKHQx_L0RqC9F_gwo24HeO1RxQKAu0GZLTjw2XZcYCHYYz7X81DuBAzGB6FNnJGH1yA: Centered frame containing Top Logo Badge, Responder Pill, and Dispatcher Pill -->
+<main class="flex-grow flex items-center justify-center p-4 sm:p-6" data-purpose="portal-main-area">
+<!-- Outer Card Frame representing the wireframe bounding box -->
+<section class="relative w-full max-w-[700px] bg-tactical-900/95 border border-slate-800/80 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-black/80 backdrop-blur-md flex flex-col items-center">
+<!-- Subtle internal tactical corner brackets for high-fidelity aesthetics -->
+<div class="absolute top-4 left-4 w-3 h-3 border-t-2 border-l-2 border-slate-700/50 rounded-tl-sm pointer-events-none"></div>
+<div class="absolute top-4 right-4 w-3 h-3 border-t-2 border-r-2 border-slate-700/50 rounded-tr-sm pointer-events-none"></div>
+<div class="absolute bottom-4 left-4 w-3 h-3 border-b-2 border-l-2 border-slate-700/50 rounded-bl-sm pointer-events-none"></div>
+<div class="absolute bottom-4 right-4 w-3 h-3 border-b-2 border-r-2 border-slate-700/50 rounded-br-sm pointer-events-none"></div>
+<!-- BEGIN: Element1_LogoCard -->
+<!-- Wireframe Top Element: Rounded substantial rectangular card labeled "Logo" -->
+<div class="w-full max-w-[440px] bg-[#111622] border border-cyan-500/25 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-lg shadow-cyan-950/30 relative overflow-hidden mb-7 group" data-purpose="brand-logo-container"><div class="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+<div class="mb-4 transform transition-transform duration-300 group-hover:scale-105 relative flex items-center justify-center">
+  <div class="w-36 h-36 rounded-2xl bg-[#0a101d]/90 border border-cyan-500/40 p-3 shadow-[0_0_35px_rgba(0,229,255,0.2)] flex items-center justify-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.15),transparent_70%)] pointer-events-none"></div>
+    <svg class="w-full h-full drop-shadow-[0_0_16px_rgba(0,229,255,0.45)]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="52" stroke="#16324a" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7"></circle>
+      <circle cx="60" cy="60" r="40" stroke="#00e5ff" stroke-width="1" opacity="0.3"></circle>
+      <circle cx="60" cy="60" r="26" stroke="#00e5ff" stroke-width="1.5" opacity="0.55"></circle>
+      <circle cx="60" cy="60" r="12" stroke="#00e5ff" stroke-width="1" opacity="0.7"></circle>
+      <line x1="60" y1="8" x2="60" y2="112" stroke="#00e5ff" stroke-width="1.2" opacity="0.4"></line>
+      <line x1="8" y1="60" x2="112" y2="60" stroke="#00e5ff" stroke-width="1.2" opacity="0.4"></line>
+      <path d="M60 60 L98 32 A52 52 0 0 0 60 8 Z" fill="url(#radarSweepGrad)" opacity="0.35"></path>
+      <circle cx="60" cy="60" r="24" fill="#08121f" stroke="#00e5ff" stroke-width="2"></circle>
+      <path d="M44 60H51L55 48L60 72L65 52L69 60H76" stroke="#00e5ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="84" cy="42" r="2.5" fill="#00e5ff" class="animate-ping" opacity="0.75"></circle>
+      <circle cx="84" cy="42" r="2" fill="#00e5ff"></circle>
+      <defs>
+        <linearGradient id="radarSweepGrad" x1="60" y1="60" x2="95" y2="25">
+          <stop offset="0%" stop-color="#00e5ff" stop-opacity="0"></stop>
+          <stop offset="100%" stop-color="#00e5ff" stop-opacity="0.6"></stop>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+</div>
+<h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1 flex items-center justify-center gap-2 drop-shadow-[0_0_12px_rgba(0,229,255,0.3)]">
+  ESRMS
+</h1>
+<p class="text-xs sm:text-sm font-semibold tracking-wide text-slate-200 mb-2">
+  Emergency <span class="text-cyan-400 font-bold drop-shadow-[0_0_8px_rgba(0,229,255,0.5)]">SOS</span> &amp; Response Management System
+</p>
+<p class="text-xs text-slate-400 font-normal max-w-xs leading-relaxed">
+  Unified command center portal for certified telecommunicators, 911 dispatchers, and first responders.
+</p>
+<div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-[11px] font-mono text-cyan-300">
+  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+  ESRMS GATEWAY ONLINE
+</div></div>
+<!-- END: Element1_LogoCard -->
+<!-- BEGIN: Element2_ResponderAction -->
+<!-- Wireframe Middle Element: Rounded action pill labeled "Responder" -->
+<a class="action-pill w-full max-w-[500px] bg-gradient-to-r from-tactical-850 via-[#131b2e] to-tactical-850 hover:from-[#162138] hover:to-[#1a2742] border border-cyan-500/30 hover:border-cyan-400 rounded-full px-5 py-3.5 sm:px-6 sm:py-4 flex items-center justify-between shadow-md shadow-black/40 group mb-3.5 focus:outline-none focus:ring-2 focus:ring-cyan-400" data-purpose="responder-portal-action" href="#responder-auth">
+<div class="flex items-center space-x-3.5 sm:space-x-4 min-w-0">
+<!-- Tactile Badge Icon for Field Responders -->
+<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-105 group-hover:bg-cyan-500/20 transition-all shrink-0">
+<!-- First Responder Siren / Pulse Shield Icon -->
+<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M12 2a7 7 0 00-7 7v4.586l-.707.707A1 1 0 005 16h14a1 1 0 00.707-1.707L19 13.586V9a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M9 19v1a3 3 0 006 0v-1" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle cx="12" cy="9" fill="currentColor" r="1.5"></circle>
+</svg>
+</div>
+<!-- Label & Description -->
+<div class="text-left truncate">
+<div class="text-base sm:text-lg font-bold text-white group-hover:text-cyan-300 transition-colors tracking-wide flex items-center gap-2">
+<span class="">Responder</span>
+<span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/60 hidden sm:inline-block">Field Ops</span>
+</div>
+<p class="text-xs text-slate-400 truncate">
+              EMS • Fire &amp; Rescue • Patrol • Mobile CAD
+            </p>
+</div>
+</div>
+<!-- Trailing Trigger Indicator -->
+<div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:text-cyan-300 group-hover:border-cyan-500/50 group-hover:translate-x-1 transition-all shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</a>
+<!-- END: Element2_ResponderAction -->
+<!-- BEGIN: Element3_DispatcherAction -->
+<!-- Wireframe Bottom Element: Rounded action pill labeled "Organization / 911 Dispatcher" -->
+<a class="action-pill w-full max-w-[500px] bg-gradient-to-r from-tactical-850 via-[#131b2e] to-tactical-850 hover:from-[#162138] hover:to-[#1a2742] border border-slate-700/80 hover:border-cyan-400/80 rounded-full px-5 py-3.5 sm:px-6 sm:py-4 flex items-center justify-between shadow-md shadow-black/40 group focus:outline-none focus:ring-2 focus:ring-cyan-400" data-purpose="dispatcher-portal-action" href="#dispatcher-auth">
+<div class="flex items-center space-x-3.5 sm:space-x-4 min-w-0">
+<!-- Tactile Badge Icon for PSAP / Telecommunicators -->
+<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:text-cyan-400 group-hover:scale-105 group-hover:bg-blue-500/20 transition-all shrink-0">
+<!-- Command Console Headset Icon -->
+<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M4 11a8 8 0 0116 0" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<!-- Label & Description -->
+<div class="text-left truncate">
+<div class="text-base sm:text-lg font-bold text-white group-hover:text-cyan-300 transition-colors tracking-wide flex items-center gap-2">
+<span class="truncate">Organization / 911 Dispatcher</span>
+</div>
+<p class="text-xs text-slate-400 truncate">
+              PSAP Operations • Telecommunicators • Agency Command
+            </p>
+</div>
+</div>
+<!-- Trailing Trigger Indicator -->
+<div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:text-cyan-300 group-hover:border-cyan-500/50 group-hover:translate-x-1 transition-all shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</a>
+<!-- END: Element3_DispatcherAction -->
+<!-- Footer Micro-Verification Details within card -->
+<div class="mt-8 text-center text-[11px] font-mono text-slate-400 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+<span class="">FIPS 140-3 COMPLIANT</span>
+<span class="">•</span>
+<span class="">CJIS AUTH LEVEL 4</span>
+<span class="">•</span>
+<a class="text-slate-400 hover:text-cyan-400 underline transition-colors" href="#help-desk">Emergency TAC Support</a>
+</div>
+</section>
+</main>
+<!-- END: MainPortalContainer -->
+<!-- BEGIN: SiteFooter -->
+<footer class="w-full px-6 py-4 border-t border-slate-800/60 bg-tactical-950/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 select-none z-10 gap-2" data-purpose="site-footer">
+<div class="">© 2025 ESRMS Critical Response Systems Inc. Authorized Public Safety Personnel Only.</div>
+<div class="flex items-center space-x-6 text-slate-400">
+<a class="hover:text-cyan-400 transition-colors" href="#privacy">CJIS Policy</a>
+<a class="hover:text-cyan-400 transition-colors" href="#security">Security Clearance</a>
+<a class="hover:text-cyan-400 transition-colors flex items-center gap-1.5" href="#status">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        All Systems Normal
+      </a>
+</div>
+</footer>
+<!-- END: SiteFooter -->
+<!-- BEGIN: ClockScript -->
+<script data-purpose="live-telemetry-clock">
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getUTCHours()).padStart(2, '0');
+      const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+      const clockElement = document.getElementById('live-clock');
+      if (clockElement) {
+        clockElement.textContent = `UTC ${hours}:${minutes}:${seconds}`;
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+<!-- END: ClockScript -->
+
+
+</body></html>

@@ -1,0 +1,13 @@
+{% from "account/_macros.html" import card %}
+{# Settings -> Display. The buttons are wired in account.js (initDisplay); the chosen size is saved per account. #}
+<section class="{{ card }} p-5" aria-labelledby="display-size-title">
+  <h2 id="display-size-title" class="text-[0.6875rem] font-mono font-bold uppercase tracking-widest text-slate-400">Size</h2>
+  <div id="display-scales" role="group" aria-labelledby="display-size-title" class="mt-3 flex flex-wrap gap-2">
+    {% for scale in display_scales %}
+    <button type="button" data-scale="{{ scale }}" aria-pressed="{{ 'true' if scale == display_scale else 'false' }}" aria-label="Set display size to {{ scale }}%"
+            class="min-w-[4rem] px-4 py-2 rounded-full border text-sm font-mono font-semibold transition border-slate-600 text-slate-200 hover:border-brand-cyan/60 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1422] disabled:cursor-wait aria-pressed:border-brand-cyan aria-pressed:bg-brand-cyan/15 aria-pressed:text-brand-cyan aria-pressed:shadow-tacticalCyan">{{ scale }}%</button>
+    {% endfor %}
+  </div>
+  <p class="mt-3 text-xs text-slate-400">Text, buttons, cards and the sidebar all scale together. {{ display_default }}% is the default; pick a bigger size if text is hard to read.</p>
+  <p id="display-saved" class="mt-2 text-[0.6875rem] text-slate-500" role="status" aria-live="polite"></p>
+</section>

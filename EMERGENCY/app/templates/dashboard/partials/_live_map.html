@@ -1,0 +1,15 @@
+<section class="lg:col-span-8 bg-brand-card rounded-lg border border-brand-border relative flex flex-col overflow-hidden shadow-tacticalCyan">
+  <div class="relative w-full h-full min-h-[30rem] bg-[#070b13] overflow-hidden flex-1">
+    <div class="absolute inset-0">{{ live_map.body | safe }}</div>
+
+    {# Shown when the selected incident has no usable GPS fix. The map does not move. #}
+    <div id="map-location-alert" role="alert"
+         class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-[1000] max-w-[90%] px-4 py-2.5 rounded-lg bg-red-950/95 border border-red-500/60 text-red-100 text-sm font-semibold shadow-2xl flex items-center gap-2">
+      <span class="material-symbols-outlined text-red-400 text-[1.25rem]" aria-hidden="true">location_off</span>
+      <span data-text>Citizen location unavailable.</span>
+    </div>
+
+    {# Selected incident details and status controls. Filled by dispatch.js. #}
+    <div id="incident-detail" class="hidden absolute left-3 right-3 bottom-3 sm:right-auto sm:w-[25rem] z-[1000] max-h-[70%] overflow-y-auto rounded-lg bg-[#0b0f19]/95 border border-brand-border shadow-2xl backdrop-blur" aria-live="polite"></div>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" fill="none">
+  <!-- background grid: rings + crosshair (matches EMERGENCY/app/templates/partials/_logo.html) -->
+  <g stroke="#67E8F9" stroke-opacity="0.15" stroke-width="1">
+    <circle cx="75" cy="75" r="67"/>
+    <circle cx="75" cy="75" r="43"/>
+    <path d="M75 0V150M0 75H150"/>
+  </g>
+  <!-- emblem: 96x96 centred -->
+  <g transform="translate(27 27) scale(0.96)">
+    <circle cx="50" cy="50" r="42" stroke="#00D9FF" stroke-width="1.8" stroke-dasharray="5 3" opacity="0.6"/>
+    <circle cx="50" cy="50" r="33" stroke="#1685FF" stroke-width="2" opacity="0.4"/>
+    <path d="M50 10V18M50 82V90M10 50H18M82 50H90" stroke="#00D9FF" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="22" fill="#08101C" stroke="#00D9FF" stroke-width="2.5"/>
+    <path d="M34 50H40L44 38L50 62L56 46L60 50H66" stroke="#00D9FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="50" cy="27" r="3" fill="#00D9FF"/>
+  </g>
+</svg>

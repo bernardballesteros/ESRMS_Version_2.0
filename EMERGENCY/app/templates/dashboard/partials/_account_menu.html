@@ -1,0 +1,63 @@
+{# Account dropdown opened from the avatar in _topbar.html. `initials` comes from the including template. #}
+{% set item = "w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-200 hover:bg-white/5 transition text-left" %}
+{% set active = "bg-brand-cyan/10 !text-brand-cyan border-l-2 border-brand-cyan" %}
+<div id="account-menu" role="menu" data-open="false"
+     class="account-menu absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-xl bg-[#0f1422] border border-brand-border shadow-2xl overflow-hidden z-50">
+
+  <div class="px-4 pt-4 pb-3 flex items-center gap-3">
+    <span data-avatar class="w-11 h-11 shrink-0 rounded-full overflow-hidden bg-gradient-to-tr from-brand-cyan/20 to-brand-cyan/80 border-2 border-brand-cyan flex items-center justify-center font-mono text-sm font-bold text-black">{% if current_user.avatar_url %}<img src="{{ current_user.avatar_url }}" alt="" class="w-full h-full object-cover">{% else %}{{ initials }}{% endif %}</span>
+    <div class="min-w-0">
+      <p data-user-name class="text-sm font-bold text-white truncate">{{ current_user.name }}</p>
+      <p class="text-xs text-slate-400 truncate">{{ current_user.email }}</p>
+      <p class="text-[0.625rem] font-mono text-brand-cyan mt-0.5 truncate">
+        {{ current_user.agency_name or (current_user.role or 'user')|capitalize }}{% if current_user.ori_code %} · {{ current_user.ori_code }}{% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="border-t border-brand-borderSubtle py-1">
+    <a href="{{ url_for('account.settings', section='profile') }}" role="menuitem" {% if section == 'profile' %}aria-current="page"{% endif %} class="{{ item }} {{ active if section == 'profile' }}">
+      <svg class="w-4 h-4 {{ 'text-brand-cyan' if section == 'profile' else 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      My profile
+    </a>
+    <a href="{{ url_for('account.settings', section='agency') }}" role="menuitem" {% if section == 'agency' %}aria-current="page"{% endif %} class="{{ item }} {{ active if section == 'agency' }}">
+      <svg class="w-4 h-4 {{ 'text-brand-cyan' if section == 'agency' else 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      Agency settings
+    </a>
+    <a href="{{ url_for('account.settings', section='security') }}" role="menuitem" {% if section == 'security' %}aria-current="page"{% endif %} class="{{ item }} {{ active if section == 'security' }}">
+      <svg class="w-4 h-4 {{ 'text-brand-cyan' if section == 'security' else 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      Security &amp; MFA
+      {# The MFA protocol picked at registration is not proof of enrollment; show the real state. #}
+      <span data-mfa-badge class="ml-auto text-[0.625rem] font-mono uppercase {{ 'text-emerald-400' if current_user.mfa_enabled else 'text-slate-500' }}">{{ 'MFA on' if current_user.mfa_enabled else 'MFA off' }}</span>
+    </a>
+    <a href="{{ url_for('account.settings', section='notifications') }}" role="menuitem" {% if section == 'notifications' %}aria-current="page"{% endif %} class="{{ item }} {{ active if section == 'notifications' }}">
+      <svg class="w-4 h-4 {{ 'text-brand-cyan' if section == 'notifications' else 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      Notifications
+    </a>
+    <a href="{{ url_for('account.settings', section='display') }}" role="menuitem" {% if section == 'display' %}aria-current="page"{% endif %} class="{{ item }} {{ active if section == 'display' }}">
+      <svg class="w-4 h-4 {{ 'text-brand-cyan' if section == 'display' else 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      Settings
+    </a>
+  </div>
+
+  {% if can_dispatch %}
+  {# Saved per dispatcher account (app/duty.py); only On Duty dispatchers receive new incidents. #}
+  <div class="border-t border-brand-borderSubtle py-2" data-duty-menu data-duty-url="{{ url_for('dispatch.get_duty') }}">
+    <p class="px-4 pb-1 text-[0.6875rem] font-mono uppercase tracking-wider text-slate-500">Console status</p>
+    {% for value, label, dot in [('on_duty', 'On duty', 'bg-emerald-400'), ('on_break', 'On break', 'bg-amber-400'), ('off_duty', 'Off duty', 'bg-slate-500')] %}
+    <button type="button" role="menuitemradio" data-duty="{{ value }}" data-dot="{{ dot }}" aria-checked="false" class="{{ item }}">
+      <span class="w-2.5 h-2.5 rounded-full {{ dot }}"></span>
+      {{ label }}
+      <svg data-check class="w-4 h-4 ml-auto text-brand-cyan hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="border-t border-brand-borderSubtle py-1">
+    <a href="{{ url_for('auth.logout') }}" role="menuitem" class="{{ item }} text-red-300 hover:bg-red-500/10">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      Sign out
+    </a>
+  </div>
+</div>

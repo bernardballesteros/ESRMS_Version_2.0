@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Sign In{% endblock %}
+{% block background %}
+<div class="fixed inset-0 bg-grid-tech pointer-events-none opacity-40"></div>
+<div class="fixed inset-0 ambient-radial pointer-events-none"></div>
+{% endblock %}
+
+{# The Hospital Portal signs in through its own routes (app/routes/hospital_auth.py) but shares this page. #}
+{% set hospital = role == 'hospital' %}
+{% block content %}
+<main class="relative z-10 w-full max-w-5xl mx-auto px-4 py-8 md:py-12 flex-1 flex items-center justify-center">
+  <div class="relative w-full max-w-4xl p-2 sm:p-6 md:p-10 rounded-3xl border border-cyan-500/15 bg-gradient-to-b from-[#0a111e]/90 to-[#070c16]/95 cyan-glow-subtle backdrop-blur-xl">
+    <div class="corner-bracket top-3 left-3 border-t-2 border-l-2"></div>
+    <div class="corner-bracket top-3 right-3 border-t-2 border-r-2"></div>
+    <div class="corner-bracket bottom-3 left-3 border-b-2 border-l-2"></div>
+    <div class="corner-bracket bottom-3 right-3 border-b-2 border-r-2"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+      {# Left: branding #}
+      <section class="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left space-y-6">
+        {% include "partials/_logo.html" %}
+        <div class="space-y-2">
+          <h1 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-white flex items-center justify-center md:justify-start gap-2">
+            <span>ESRMS</span>
+            <span class="text-xs px-2 py-0.5 rounded font-mono font-medium bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 tracking-wider">v4.8</span>
+          </h1>
+          <p class="text-sm lg:text-base text-gray-300 font-medium leading-snug">
+            Emergency <span class="text-cyanAccent font-semibold">SOS</span> &amp; Response Management System
+          </p>
+          <p class="text-xs text-textMuted max-w-xs leading-relaxed">
+            {% if hospital %}Hospital Portal for receiving hospitals: incoming patient reports, trauma bays and handoffs.
+            {% else %}Unified command center portal for certified telecommunicators, 911 dispatchers, and first responders.{% endif %}
+          </p>
+        </div>
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-wide whitespace-nowrap">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+          <span>SECURE RESPONSE NETWORK</span>
+        </div>
+      </section>
+
+      {# Right: login card #}
+      <section class="md:col-span-7 flex justify-center">
+        <div class="w-full max-w-[26.25rem] rounded-[20px] p-6 sm:p-8 bg-[#0D1420]/90 border border-cyan-500/25 cyan-glow shadow-2xl relative">
+          <div class="mb-6">
+            <div class="flex items-center justify-between">
+              <h2 class="text-2xl font-bold text-white tracking-tight">Welcome Back</h2>
+              <div class="w-7 h-7 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+            </div>
+            <p class="text-xs text-textMuted mt-1">
+              {% if role == 'citizen' %}Sign in to access emergency response network.
+              {% elif role == 'responder' %}Responder sign-in for field operations personnel.
+              {% elif role == 'organization' %}Organization / 911 Dispatcher console sign-in.
+              {% elif role == 'admin' %}System administrator sign-in. Authorized personnel only.
+              {% elif hospital %}Hospital Portal sign-in for receiving hospitals.
+              {% else %}Sign in to access the emergency response network.{% endif %}
+            </p>
+            {% if role %}
+            <a href="{{ url_for('main.index') }}" class="inline-block mt-2 text-[0.6875rem] font-mono text-gray-500 hover:text-cyanAccent">← CHANGE PORTAL</a>
+            {% endif %}
+          </div>
+
+          {% include "partials/_flashes.html" %}
+
+          <form method="post" action="{{ url_for('hospital_auth.login') if hospital else url_for('auth.login', role=role) }}" class="space-y-4">
+            <div class="space-y-1.5 text-left">
+              <label for="email" class="block text-xs font-medium text-gray-300 tracking-wide">Email</label>
+              <div class="input-field relative rounded-[10px] bg-[#070D18] border border-cyan-500/20 transition-all duration-200">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <input type="email" id="email" name="email" required autocomplete="email" placeholder="username@gmail.com" value="{{ form.get('email', '') }}"
+                       class="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-[10px] text-sm text-white placeholder-gray-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-left">
+              <label for="password" class="block text-xs font-medium text-gray-300 tracking-wide">Password</label>
+              <div class="input-field relative rounded-[10px] bg-[#070D18] border border-cyan-500/20 transition-all duration-200">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="eg.12345678"
+                       class="w-full pl-10 pr-11 py-2.5 bg-transparent rounded-[10px] text-sm text-white placeholder-gray-500 focus:outline-none">
+                <button type="button" data-toggle-password="password" title="Toggle password visibility"
+                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-cyanAccent transition-colors focus:outline-none">
+                  <svg data-eye="open" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  <svg data-eye="closed" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex justify-start pt-0.5">
+              <button type="submit" formaction="{{ url_for('hospital_auth.forgot_password') if hospital else url_for('auth.forgot_password', role=role) }}" formnovalidate
+                      class="text-xs text-cyanAccent hover:text-cyan-300 hover:underline transition-colors font-medium">
+                Forgot Password?
+              </button>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" data-loading-text="Authenticating Gateway..."
+                      class="btn-glow w-full py-3 px-4 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] text-[#050A12] font-semibold text-sm tracking-wide flex items-center justify-center gap-2 cursor-pointer">
+                <span data-label>Sign in</span>
+                <svg data-spinner class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+              </button>
+            </div>
+
+            <div class="text-center pt-2">
+              <p class="text-xs text-textMuted">
+                Don't have an account?
+                <a href="{{ url_for('hospital_auth.register') if hospital else url_for('auth.register', role=role) }}" class="text-cyanAccent hover:text-cyan-300 font-medium hover:underline transition-colors ml-1">Register for free</a>
+              </p>
+            </div>
+          </form>
+
+          <div class="mt-6 pt-4 border-t border-cyan-500/10 flex items-center justify-between text-[0.625rem] font-mono text-gray-500">
+            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>CJIS AUTH 4.0</span>
+            <span>NODE: PAC-911-CORE</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+{% endblock %}

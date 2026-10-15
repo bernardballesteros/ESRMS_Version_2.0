@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Dispatch Center{% endblock %}
+{% block tailwind_theme %}
+<script src="{{ url_for('static', filename='js/tailwind.dashboard.js') }}"></script>
+{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{{ live_map.header | safe }}
+{% endblock %}
+{% block body_class %}bg-[#080c14] text-slate-100 font-sans min-h-screen antialiased{% endblock %}
+
+{% block header %}
+{% include "dashboard/partials/_topbar.html" %}
+{% include "dashboard/partials/_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex flex-col">
+  {% include "partials/_flashes.html" %}
+
+  <div data-tab-panel="dispatch" class="flex-1 flex flex-col">
+    {% include "dashboard/partials/_stats.html" %}
+    <main class="flex-1 p-3 grid grid-cols-1 lg:grid-cols-12 gap-3">
+      {% include "dashboard/partials/_live_map.html" %}
+      <div class="lg:col-span-4 flex flex-col gap-3">
+        {% include "dashboard/partials/_dispatcher.html" %}
+        {% include "dashboard/partials/_responders.html" %}
+      </div>
+    </main>
+  </div>
+
+  <div data-tab-panel="announcements" class="hidden flex-1 bg-[#070b14]">
+    {% if can_manage_announcements %}
+    {% include "announcements/_dashboard.html" %}
+    {% else %}
+    <div class="p-6 text-sm text-slate-400">Your account cannot manage announcements. <a class="text-brand-cyan underline" href="{{ url_for('announcements.viewer') }}">View public announcements</a>.</div>
+    {% endif %}
+  </div>
+
+  <div data-tab-panel="reports" class="hidden flex-1">
+    {% include "dashboard/partials/_incident_history.html" %}
+  </div>
+
+  <div data-tab-panel="hospital" class="hidden flex-1 bg-[#070b14]">
+    {% if can_dispatch %}
+    {% include "dashboard/partials/_hospital_signal.html" %}
+    {% else %}
+    <div class="p-6 text-sm text-slate-400">Your account cannot send hospital signals.</div>
+    {% endif %}
+  </div>
+
+  <div data-tab-panel="analytics" class="hidden flex-1 bg-[#070b14]">
+    {% if can_dispatch %}
+    {% include "dashboard/partials/_analytics.html" %}
+    {% else %}
+    <div class="p-6 text-sm text-slate-400">Your account cannot view incident analytics.</div>
+    {% endif %}
+  </div>
+</div>
+{% include "dashboard/partials/_organization_dialogs.html" %}
+{% set notify_watch = true %}
+{% include "dashboard/partials/_notify_config.html" %}
+<script type="application/json" id="dispatch-config">{{ {
+  'realtime': {'url': config.SUPABASE_URL, 'key': config.SUPABASE_KEY, 'table': 'dispatch_feed'},
+  'options': dispatch_options,
+  'canDispatch': can_dispatch,
+  'me': current_user.id,
+  'map': {'center': live_map.center, 'zoom': live_map.zoom},
+  'api': {
+    'incidents': url_for('dispatch.list_incidents'),
+    'history': url_for('dispatch.incident_history'),
+    'hotlines': url_for('dispatch.list_hotlines'),
+    'available': url_for('dispatch.available_dispatchers'),
+  },
+} | tojson }}</script>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="{{ url_for('static', filename='js/announcements-realtime.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+{% if can_manage_announcements %}
+<script src="{{ url_for('static', filename='js/announcements-admin.js') }}"></script>
+{% endif %}
+<script>{{ live_map.script | safe }}</script>
+{# Hand the existing folium/Leaflet map to the dispatch console; no second map is created. #}
+<script>window.ESRMS_MAP = {{ live_map.name }};</script>
+<script src="{{ url_for('static', filename='js/dispatch.js') }}"></script>
+{% if can_dispatch %}
+<script src="{{ url_for('static', filename='js/hospital-common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/hospital-signal.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endif %}
+<script src="{{ url_for('static', filename='js/signal-archive.js') }}"></script>
+<script src="{{ url_for('static', filename='js/organizations.js') }}"></script>
+{% endblock %}

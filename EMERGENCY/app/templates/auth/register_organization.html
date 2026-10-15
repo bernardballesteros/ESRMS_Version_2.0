@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% import "partials/_forms.html" as f %}
+{% block title %}Agency Registration{% endblock %}
+{% block html_class %}dark{% endblock %}
+{% block tailwind_theme %}<script src="{{ url_for('static', filename='js/tailwind.material.js') }}"></script>{% endblock %}
+{% block body_class %}bg-surface text-on-surface font-body-md antialiased{% endblock %}
+
+{% macro section_head(icon, title, subtitle, step, accent='secondary') %}
+<div class="flex items-center justify-between gap-space-sm pb-space-sm mb-space-md">
+  <div class="flex items-center gap-space-sm">
+    <div class="w-7 h-7 rounded {{ 'bg-secondary-container/20 text-secondary' if accent == 'secondary' else 'bg-primary-container/20 text-primary-container' }} flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[1.125rem]">{{ icon }}</span>
+    </div>
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">{{ title }}</h2>
+      {% if subtitle %}<p class="font-body-sm text-body-sm text-on-surface-variant">{{ subtitle }}</p>{% endif %}
+    </div>
+  </div>
+  <span class="font-label-sm text-label-sm {{ 'text-secondary bg-secondary-container/20' if accent == 'secondary' else 'text-primary bg-primary-container/15' }} px-space-sm py-0.5 rounded whitespace-nowrap">STEP {{ step }}/04</span>
+</div>
+{% endmacro %}
+
+{% block content %}
+<main class="relative w-full flex-1">
+  <div class="relative w-full max-w-7xl mx-auto px-margin-mobile md:px-margin py-space-lg">
+    <div class="absolute top-12 left-1/2 -translate-x-1/2 w-[43.75rem] max-w-full h-[21.25rem] bg-primary-container/10 blur-[130px] rounded-full pointer-events-none"></div>
+
+    {# Heading & portal switch #}
+    <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-space-md mb-space-lg pb-space-md">
+      <div class="flex flex-col gap-space-xs">
+        <div class="flex flex-wrap items-center gap-space-xs">
+          <span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded bg-primary-container/15 text-primary text-label-sm font-label-sm uppercase tracking-widest">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+            PSAP OPERATIONS • CJIS LEVEL 4 AGENCY ENROLLMENT
+          </span>
+          <span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded bg-surface-container-high text-on-surface-variant text-label-sm font-label-sm">
+            <span class="material-symbols-outlined text-[0.8125rem] text-secondary">encrypted</span>FIPS 140-3
+          </span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Register Agency or 911 Dispatch Desk</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Enroll a primary Public Safety Answering Point (PSAP), Regional E-911 Communications Bureau, or certified Telecommunicator CAD dispatch node.
+        </p>
+      </div>
+    </div>
+
+    <div class="relative">{% include "partials/_flashes.html" %}</div>
+
+    <div class="relative grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+      <form method="post" enctype="multipart/form-data" class="xl:col-span-8 flex flex-col gap-space-lg">
+
+        {# 1 Organization #}
+        <div class="bg-surface-container-low/90 backdrop-blur-md rounded-xl p-space-lg shadow-xl">
+          {{ section_head('corporate_fare', '1. Organization & Agency Credentials', 'Validate public safety jurisdiction and federal NCIC identification code.', '01') }}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+            {{ f.input('agency_name', 'Official Agency / PSAP Center Name *', 'apartment', 'e.g. Metro West Regional Emergency Communications PSAP #04', tag='FCC / NENA Registered', tag_class='text-on-surface-variant', form=form, extra_class='md:col-span-2') }}
+            <div class="flex flex-col gap-space-xs">
+              <label for="agency_type" class="font-label-md text-label-md text-on-surface-variant">Agency Type *</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-outline material-symbols-outlined text-[1.125rem] pointer-events-none">domain_verification</span>
+                <select id="agency_type" name="agency_type" required class="w-full pl-10 pr-10 py-2.5 bg-surface-container-lowest rounded-lg text-on-surface font-body-md text-body-md appearance-none focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer">
+                  <option value="" disabled {% if not form.get('agency_type') %}selected{% endif %}>Select Agency Classification</option>
+                  {% for key, label in agency_types.items() %}
+                  <option value="{{ key }}" {% if form.get('agency_type') == key %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <span class="absolute right-3 pointer-events-none text-outline material-symbols-outlined text-[1.125rem]">expand_more</span>
+              </div>
+            </div>
+            {{ f.input('ori_code', 'ORI / NCIC Agency ID Code *', 'badge', 'e.g. CA0190000', tag='Standard 9-Char', tag_class='text-secondary', form=form, attrs='maxlength="9" style="text-transform:uppercase"') }}
+            {{ f.input('jurisdiction', 'Official Jurisdiction / Operational Sector *', 'fmd_good', 'e.g. Pacific Coast Metro District 04 & Surrounding Mutual-Aid Sectors', form=form, extra_class='md:col-span-2') }}
+          </div>
+        </div>
+
+        {# 2 Lead dispatcher #}
+        <div class="bg-surface-container-low/90 backdrop-blur-md rounded-xl p-space-lg shadow-xl">
+          {{ section_head('support_agent', '2. Lead Dispatcher & Admin Details', 'Designate the certified communications supervisor managing CAD terminals.', '02', 'primary') }}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+            {{ f.input('admin_name', 'Administrator / Telecommunicator Full Name *', 'person', 'e.g. Capt. Elena Diaz, ENP', form=form, attrs='autocomplete="name"') }}
+            {{ f.input('email', 'Official Departmental Email *', 'mail', 'e.g. e.diaz@psap911.gov', type='email', tag='.gov / .org / .us', tag_class='text-outline', form=form, attrs='autocomplete="email"') }}
+            {{ f.input('cad_cert', 'CAD Terminal ID / APCO Cert # *', 'terminal', 'e.g. OP-4092-CAD-L4', tag='NENA / APCO Verified', tag_class='text-secondary', form=form) }}
+            {{ f.input('psap_phone', 'Direct PSAP Administrative Trunkline *', 'call', 'e.g. +1 (555) 019-9411', type='tel', tag='Non-Emergency Line', tag_class='text-outline', form=form) }}
+          </div>
+        </div>
+
+        {# 3 Access security #}
+        <div class="bg-surface-container-low/90 backdrop-blur-md rounded-xl p-space-lg shadow-xl">
+          {{ section_head('key', '3. Access Security & Encryption Layer', 'Set the administrative console password.', '03') }}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+            <div class="flex flex-col gap-space-xs">
+              {{ f.input('password', 'Master Command Console Password *', 'lock', '••••••••••••••••', type='password', tag='Min 16 chars', attrs='minlength="16" autocomplete="new-password" data-strength-meter="password-strength" aria-describedby="password-strength"') }}
+              <span class="font-label-sm text-label-sm text-outline">Minimum 16 characters, 1 uppercase, 1 symbol, 1 numeric block.</span>
+            </div>
+            <div id="password-strength" class="flex flex-col gap-space-xs" aria-live="polite">
+              <div class="flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
+                <span>Password Strength</span>
+                <span data-strength-label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">—</span>
+              </div>
+              <div class="grid grid-cols-5 gap-1" aria-hidden="true">
+                {% for _ in range(5) %}<span data-strength-segment class="h-1.5 rounded-full bg-surface-container-highest transition-colors"></span>{% endfor %}
+              </div>
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-space-sm gap-y-1 p-space-sm rounded-lg bg-surface-container-lowest">
+                {% for rule, text in [('length', 'Minimum 16 characters'), ('upper', 'One uppercase letter'), ('lower', 'One lowercase letter'), ('digit', 'One numeric digit'), ('symbol', 'One special character')] %}
+                <li data-rule="{{ rule }}" class="flex items-center gap-1.5 font-label-sm text-label-sm text-outline transition-colors">
+                  <span class="material-symbols-outlined text-[0.9375rem]">radio_button_unchecked</span>{{ text }}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="md:col-span-2 flex flex-col gap-space-xs mt-space-xs">
+              <span class="font-label-md text-label-md text-on-surface-variant flex items-center justify-between">
+                <span>PSAP Authorization Letter / Agency Verification Document</span>
+                <span class="text-outline font-label-sm text-label-sm uppercase">Optional</span>
+              </span>
+              {{ f.dropzone('auth_letter', 'Click to upload official dispatch authorization', 'Must be on city/county agency letterhead signed by Public Safety Director or Sheriff. PDF, JPG or PNG (max 25MB).') }}
+            </div>
+          </div>
+        </div>
+
+        {# 4 Attestation #}
+        <div class="bg-surface-container-low/90 backdrop-blur-md rounded-xl p-space-lg shadow-xl flex flex-col gap-space-md">
+          {{ section_head('verified_user', '4. Compliance & Protocol Attestation', '', '04', 'primary') }}
+          <div class="flex flex-col gap-space-sm">
+            <label class="flex items-start gap-space-sm cursor-pointer p-space-sm rounded-lg hover:bg-surface-container-lowest/50 transition-colors">
+              <input type="checkbox" name="attest_authority" value="1" required class="mt-1 h-4 w-4 rounded accent-cyan-400" {% if form.get('attest_authority') %}checked{% endif %}>
+              <div class="flex flex-col">
+                <span class="font-label-md text-label-md text-on-surface">I certify official administrative authorization to register and bind this Public Safety Answering Point (PSAP).</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Under 18 U.S.C. § 1030 and relevant state emergency communications statutory framework.</span>
+              </div>
+            </label>
+            <label class="flex items-start gap-space-sm cursor-pointer p-space-sm rounded-lg hover:bg-surface-container-lowest/50 transition-colors">
+              <input type="checkbox" name="attest_cjis" value="1" required class="mt-1 h-4 w-4 rounded accent-cyan-400" {% if form.get('attest_cjis') %}checked{% endif %}>
+              <div class="flex flex-col">
+                <span class="font-label-md text-label-md text-on-surface">Agree to FBI CJIS Security Policy Version 5.9 and ESRMS Zero-Trust Critical Incident Protocol.</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">All dispatch keystrokes, CAD transfers, and geolocation streams are cryptographically recorded into immutable audit logs.</span>
+              </div>
+            </label>
+          </div>
+          <div class="pt-space-sm flex flex-col sm:flex-row items-center justify-between gap-space-md">
+            <div class="flex items-center gap-space-xs text-on-surface-variant">
+              <span class="material-symbols-outlined text-[1.125rem] text-secondary">vpn_key</span>
+              <span class="font-label-sm text-label-sm">AES-GCM-256 Handshake Pending</span>
+            </div>
+            <button type="submit" data-loading-text="Enrolling..." class="w-full sm:w-auto px-space-xl py-space-md rounded-lg bg-primary-container hover:bg-primary-fixed-dim text-on-primary-container font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-sm shadow-[0_0_28px_rgba(0,229,255,0.35)] active:scale-95 transition-all">
+              <span class="material-symbols-outlined text-[1.25rem]">shield_person</span>
+              <span data-label>Initialize Agency Verification &amp; Enroll</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {# Sidebar #}
+      <aside class="xl:col-span-4 flex flex-col gap-space-md">
+        <div class="bg-surface-container-low rounded-xl p-space-md shadow-xl flex flex-col gap-space-md">
+          <div class="pt-space-xs text-center">
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Already an authorized PSAP operator?</span>
+            <a href="{{ url_for('auth.login', role='organization') }}" class="font-label-md text-label-md text-primary hover:underline ml-1 inline-flex items-center gap-1">
+              Sign in to Console <span class="material-symbols-outlined text-[0.875rem]">login</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-low/70 rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+          <div class="flex items-center gap-space-sm text-on-surface">
+            <span class="material-symbols-outlined text-[1.125rem] text-secondary">gavel</span>
+            <span class="font-label-md text-label-md">Statutory Authority &amp; Compliance</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-outline">
+            ESRMS Dispatch nodes conform with APCO ANSI 1.107.1-2018, NENA i3 Next-Gen 911 Standards, and Department of Justice CJIS Security requirements for criminal justice data handling.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            {% for badge in ['NENA i3', 'APCO P25', 'FIPS 140-3', 'SOC 2 Type II'] %}
+            <span class="px-space-xs py-0.5 rounded bg-surface-container-highest text-outline text-label-sm font-label-sm">{{ badge }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='js/password-strength.js') }}"></script>{% endblock %}

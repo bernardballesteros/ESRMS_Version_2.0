@@ -1,0 +1,133 @@
+/* Organization dispatch dashboard effects. */
+.tactical-grid-bg {
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.03) 0%, transparent 80%),
+    linear-gradient(to right, rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px, 36px 36px;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.radar-sweep-blade {
+  animation: radar-sweep 4s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes emergency-ring {
+  0% { r: 12; opacity: 0.9; }
+  100% { r: 42; opacity: 0; }
+}
+.animate-ping-ring {
+  animation: emergency-ring 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0b0f19; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #00e5ff; }
+
+/* Account menu pop-in */
+.account-menu {
+  transform-origin: top right;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.account-menu[data-open="false"] {
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+  pointer-events: none;
+}
+
+/* Citizen GPS location of the selected incident: a large pulsing red dot. */
+.esrms-sos-dot {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #ef4444;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 3px #b91c1c, 0 0 18px 6px rgba(239, 68, 68, 0.85);
+}
+.esrms-sos-dot::after {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border-radius: 9999px;
+  border: 3px solid rgba(239, 68, 68, 0.9);
+  animation: esrms-sos-pulse 1.6s ease-out infinite;
+}
+@keyframes esrms-sos-pulse {
+  from { transform: scale(0.45); opacity: 1; }
+  to { transform: scale(1.35); opacity: 0; }
+}
+.leaflet-popup.esrms-popup .leaflet-popup-content-wrapper,
+.leaflet-popup.esrms-popup .leaflet-popup-tip {
+  background: #0b0f19;
+  color: #e2e8f0;
+  border: 1px solid rgba(239, 68, 68, 0.6);
+}
+.leaflet-popup.esrms-popup .leaflet-popup-content { margin: 0.625rem 0.875rem; font-size: 0.75rem; }
+.esrms-map-btn {
+  display: flex; align-items: center; gap: 0.25rem;
+  padding: 0.375rem 0.625rem; font: 600 0.6875rem/1 "JetBrains Mono", monospace;
+  background: #0b0f19; color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.4); border-radius: 6px; cursor: pointer;
+}
+.esrms-map-btn:hover { background: #111a2c; }
+
+/* Analytics and Hospital Signal: one clearly visible keyboard focus ring on the dark surface for every control and table row. */
+#analytics :focus-visible,
+.esrms-focus :focus-visible {
+  outline: 2px solid #00e5ff;
+  outline-offset: 2px;
+}
+#analytics tr:focus-visible,
+.esrms-focus tr:focus-visible { outline-offset: -2px; }
+
+/* Organization bases on the Dispatch Center map: blue, lettered by type. A base is a fixed place, never a person. */
+.esrms-org-dot {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 1.125rem; height: 1.125rem; border-radius: 9999px;
+  background: #2563eb; color: #fff; border: 2px solid #bfdbfe;
+  font: 700 0.625rem/1 "JetBrains Mono", monospace;
+}
+/* Positioned by Leaflet in pixels (iconSize), so the marker itself does not scale with the display size. */
+.esrms-org-dot--map { width: 22px; height: 22px; font-size: 11px; box-shadow: 0 0 0 2px #1e3a8a, 0 0 10px 2px rgba(59, 130, 246, 0.7); }
+.esrms-org-dot--dim { background: #1e3a8a; color: #bfdbfe; border-color: #60a5fa; border-style: dashed; }
+.leaflet-popup.esrms-popup.esrms-org-popup .leaflet-popup-content-wrapper,
+.leaflet-popup.esrms-popup.esrms-org-popup .leaflet-popup-tip { border-color: rgba(59, 130, 246, 0.7); }
+.esrms-map-legend {
+  padding: 0.5rem 0.625rem; background: rgba(11, 15, 25, 0.92); color: #e2e8f0;
+  border: 1px solid rgba(0, 229, 255, 0.4); border-radius: 6px; font: 500 0.6875rem/1.2 "JetBrains Mono", monospace;
+}
+.esrms-map-legend__toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;
+  padding: 0; background: none; border: 0; color: #00e5ff; font: inherit; font-weight: 700; letter-spacing: 0.08em; cursor: pointer;
+}
+.esrms-map-legend__toggle[aria-expanded="true"] { margin-bottom: 0.25rem; }
+.esrms-map-legend__row { display: flex; align-items: center; gap: 0.375rem; padding: 0.125rem 0; }
+.esrms-map-legend__note { margin-top: 0.25rem; padding-top: 0.25rem; border-top: 1px solid rgba(148, 163, 184, 0.3); color: #94a3b8; font-size: 0.625rem; }
+.esrms-legend-sos { width: 0.875rem; height: 0.875rem; margin: 0 0.125rem; border-radius: 9999px; background: #ef4444; border: 2px solid #fff; box-shadow: 0 0 0 2px #b91c1c; flex: none; }
+
+/* Analytics: Risk Detection Radar. The sweep is decoration only; it reads, loads and decides nothing. */
+.esrms-radar { position: relative; aspect-ratio: 1; width: 100%; max-width: 26rem; margin-inline: auto; }
+.esrms-radar::before,
+.esrms-radar__sweep { content: ""; position: absolute; inset: 5.357%; border-radius: 9999px; pointer-events: none; }   /* the r=100 disc of the 224 viewBox */
+.esrms-radar::before {
+  background: radial-gradient(circle, #0a1a2c 0%, #060c18 70%, #04080f 100%);
+  box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.55), 0 0 22px -4px rgba(0, 229, 255, 0.45), inset 0 0 30px rgba(0, 229, 255, 0.08);
+}
+.esrms-radar__sweep {
+  background: conic-gradient(from 0deg, rgba(0, 229, 255, 0) 0deg, rgba(0, 229, 255, 0) 290deg, rgba(0, 229, 255, 0.3) 360deg);
+  animation: esrms-radar-sweep 6s linear infinite;
+}
+.esrms-radar svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.esrms-radar__mark { cursor: pointer; }
+circle.esrms-radar__mark:hover, circle.esrms-radar__mark--on,
+.esrms-radar__mark:hover rect, .esrms-radar__mark--on rect { stroke: #fff; stroke-width: 1.4; stroke-dasharray: none; }
+@keyframes esrms-radar-sweep { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .esrms-radar__sweep { animation: none; display: none; }
+}

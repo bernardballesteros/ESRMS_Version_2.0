@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Announcements{% endblock %}
+{% block tailwind_theme %}
+<script src="{{ url_for('static', filename='js/tailwind.dashboard.js') }}"></script>
+{% endblock %}
+{% block body_class %}bg-[#070b14] text-slate-100 font-sans min-h-screen antialiased{% endblock %}
+
+{% block header %}
+<header class="w-full border-b border-white/[0.07] bg-[#0a0f1c]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-2 text-sm text-slate-300 hover:text-white">
+      <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">arrow_back</span>
+      {{ 'Admin Portal' if current_user.role == 'admin' else 'Dashboard' }}
+    </a>
+    <div class="flex items-center gap-4 text-sm">
+      <span class="hidden sm:inline text-slate-400">{{ current_user.email }}</span>
+      <a href="{{ url_for('auth.logout') }}" class="text-slate-400 hover:text-white">Sign out</a>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="flex-1">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4">{% include "partials/_flashes.html" %}</div>
+  {% include "announcements/_dashboard.html" %}
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="{{ url_for('static', filename='js/announcements-realtime.js') }}"></script>
+<script src="{{ url_for('static', filename='js/announcements-admin.js') }}"></script>
+{% endblock %}

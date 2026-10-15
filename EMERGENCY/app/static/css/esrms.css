@@ -1,0 +1,69 @@
+/* Shared ESRMS effects that Tailwind utilities don't cover. */
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.bg-grid-tech {
+  background-image: radial-gradient(rgba(0, 217, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.tactical-grid {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+.ambient-radial {
+  background: radial-gradient(circle at 50% 50%, rgba(22, 133, 255, 0.12) 0%, rgba(0, 217, 255, 0.05) 35%, rgba(5, 10, 18, 0) 70%);
+}
+
+.center-glow {
+  background: radial-gradient(circle at 50% 45%, rgba(0, 229, 255, 0.08) 0%, rgba(0, 82, 204, 0.03) 40%, transparent 70%);
+}
+
+.cyan-glow { box-shadow: 0 0 30px -5px rgba(0, 217, 255, 0.25); }
+.cyan-glow-subtle { box-shadow: 0 0 25px -4px rgba(0, 217, 255, 0.12); }
+
+.btn-glow {
+  box-shadow: 0 4px 20px -2px rgba(0, 217, 255, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-glow:hover {
+  box-shadow: 0 6px 28px rgba(0, 217, 255, 0.65);
+  transform: translateY(-2px);
+}
+
+.corner-bracket {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(0, 217, 255, 0.45);
+  pointer-events: none;
+}
+
+.input-field:focus-within {
+  border-color: #00D9FF;
+  box-shadow: 0 0 0 1px #00D9FF, 0 0 16px -2px rgba(0, 217, 255, 0.3);
+}
+
+.action-pill { transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.action-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(0, 229, 255, 0.25);
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 0.3; }
+}
+.pulse-ring { animation: pulse-ring 3s infinite ease-in-out; }
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.radar-sweep { animation: radar-sweep 6s linear infinite; }

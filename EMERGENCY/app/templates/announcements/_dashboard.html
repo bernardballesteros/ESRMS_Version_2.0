@@ -1,0 +1,303 @@
+{# Announcement management dashboard. Needs `realtime` and `ann_options` from announcements.manage_context(),
+   plus static/js/announcements-realtime.js and announcements-admin.js. #}
+{% set card = "rounded-2xl bg-[#0f1729]/90 border border-white/[0.07]" %}
+{% set input = "w-full px-3 py-2 rounded-lg bg-[#0a1020] border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40" %}
+{% set label = "block text-xs font-semibold text-slate-300 mb-1" %}
+<div id="ann-dashboard" class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 text-slate-100">
+  <script type="application/json" id="ann-config">{{ {
+    'realtime': realtime,
+    'options': ann_options,
+    'viewerUrl': url_for('announcements.viewer'),
+    'api': {
+      'list': url_for('announcements.list_announcements'),
+      'create': url_for('announcements.create_announcement'),
+      'base': url_for('announcements.list_announcements'),
+      'templates': url_for('announcements.list_templates'),
+    },
+  } | tojson }}</script>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    {# ------------------------------------------------ main column #}
+    <div class="lg:col-span-8 flex flex-col gap-6 min-w-0">
+
+      {# A. Header #}
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-red-500 text-[2.75rem] -rotate-12" aria-hidden="true">campaign</span>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Announcements</h1>
+            <p class="text-sm text-slate-400 mt-0.5">Post and manage important messages for your team and community.</p>
+          </div>
+        </div>
+        <button type="button" data-action="create"
+                class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-white font-semibold text-sm shadow-lg shadow-cyan-900/40 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
+          <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">edit_square</span>
+          Create Announcement
+        </button>
+      </header>
+
+      {# B. Featured #}
+      <section id="ann-featured" aria-label="Featured announcement" aria-live="polite">
+        <div class="h-52 rounded-2xl bg-[#0f1729] border border-white/[0.07] animate-pulse"></div>
+      </section>
+
+      {# Filters #}
+      <section class="{{ card }} p-3" aria-label="Search and filter">
+        <form id="ann-filters" class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2" role="search">
+          <label class="col-span-2 md:col-span-4 xl:col-span-2 relative">
+            <span class="sr-only">Search announcements</span>
+            <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[1.125rem]" aria-hidden="true">search</span>
+            <input type="search" name="q" placeholder="Search title or message" class="{{ input }} pl-9">
+          </label>
+          <label><span class="sr-only">Category</span>
+            <select name="category" class="{{ input }}"><option value="">All categories</option>
+              {% for k, v in ann_options.categories.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></label>
+          <label><span class="sr-only">Priority</span>
+            <select name="priority" class="{{ input }}"><option value="">All priorities</option>
+              {% for k, v in ann_options.priorities.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></label>
+          <label><span class="sr-only">Status</span>
+            <select name="status" class="{{ input }}"><option value="">All statuses</option>
+              {% for s in ['active', 'scheduled', 'draft', 'expired', 'archived'] %}<option value="{{ s }}">{{ s|capitalize }}</option>{% endfor %}</select></label>
+          <label class="flex items-center gap-1"><span class="text-[0.6875rem] text-slate-500 shrink-0">From</span>
+            <input type="date" name="date_from" class="{{ input }} [color-scheme:dark]"></label>
+          <label class="flex items-center gap-1"><span class="text-[0.6875rem] text-slate-500 shrink-0">To</span>
+            <input type="date" name="date_to" class="{{ input }} [color-scheme:dark]"></label>
+          <div class="col-span-2 md:col-span-4 xl:col-span-7 flex flex-wrap items-center justify-between gap-2 pt-1">
+            <label class="flex items-center gap-2 text-xs text-slate-400">Sort
+              <select name="sort" class="{{ input }} !w-auto"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>
+            <button type="reset" class="text-xs text-slate-400 hover:text-white underline">Clear filters</button>
+          </div>
+        </form>
+      </section>
+
+      {# C. Recent announcements #}
+      <section aria-labelledby="ann-list-title">
+        <div class="flex items-center justify-between mb-3">
+          <h2 id="ann-list-title" class="text-lg font-bold text-white">Recent Announcements</h2>
+          <span id="ann-result-count" class="text-xs text-slate-500"></span>
+        </div>
+        <div id="ann-list" class="flex flex-col gap-3" aria-live="polite" aria-busy="true">
+          {% for _ in range(3) %}<div class="h-24 rounded-xl bg-[#0f1729] border border-white/[0.07] animate-pulse"></div>{% endfor %}
+        </div>
+      </section>
+    </div>
+
+    {# ------------------------------------------------ side column #}
+    <aside class="lg:col-span-4 flex flex-col gap-4">
+      {# D. Status #}
+      <section class="{{ card }} p-5" aria-labelledby="ann-status-title">
+        <div class="flex items-center justify-between mb-4">
+          <h2 id="ann-status-title" class="font-bold text-white">Announcement Status</h2>
+          <span id="ann-live" class="flex items-center gap-1.5 text-[0.6875rem] text-slate-400" title="Live connection">
+            <span class="w-2 h-2 rounded-full bg-slate-500"></span><span>Connecting…</span>
+          </span>
+        </div>
+        <ul class="flex flex-col gap-3">
+          {% for key, text, icon, tile in [
+            ('active', 'Active', 'campaign', 'bg-red-600/20 text-red-400 border-red-500/30'),
+            ('scheduled', 'Scheduled', 'schedule', 'bg-slate-500/15 text-slate-300 border-slate-500/30'),
+            ('archived', 'Archived', 'inventory_2', 'bg-slate-500/15 text-slate-300 border-slate-500/30'),
+            ('draft', 'Drafts', 'draft', 'bg-slate-500/15 text-slate-300 border-slate-500/30')] %}
+          <li>
+            <button type="button" data-filter-status="{{ key }}" class="w-full flex items-center gap-3 rounded-lg p-1 -m-1 hover:bg-white/[0.03] text-left">
+              <span class="w-10 h-10 rounded-lg border flex items-center justify-center {{ tile }}"><span class="material-symbols-outlined text-[1.375rem]" aria-hidden="true">{{ icon }}</span></span>
+              <span class="flex-1 text-sm text-slate-300">{{ text }}</span>
+              <span data-count="{{ key }}" class="text-xl font-bold text-white tabular-nums">–</span>
+            </button>
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="text-[0.6875rem] text-slate-500 mt-4 leading-relaxed">Active: published and not expired. Scheduled: publication time still ahead. Archived includes expired posts.</p>
+      </section>
+
+      {# E. Quick actions #}
+      <section class="{{ card }} p-5" aria-labelledby="ann-quick-title">
+        <h2 id="ann-quick-title" class="font-bold text-white mb-3">Quick Actions</h2>
+        <div class="flex flex-col gap-1.5">
+          {% for action, text, icon, primary in [
+            ('create', 'Post New Announcement', 'campaign', True),
+            ('view-all', 'View All Announcements', 'format_list_bulleted', False),
+            ('schedule', 'Schedule Announcement', 'calendar_month', False),
+            ('templates', 'Manage Templates', 'description', False)] %}
+          <button type="button" data-action="{{ action }}"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition
+                         {{ 'bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-white font-semibold' if primary else 'text-slate-300 hover:bg-white/[0.05]' }}">
+            <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">{{ icon }}</span>{{ text }}
+          </button>
+          {% endfor %}
+          <a href="{{ url_for('announcements.viewer') }}" target="_blank" rel="noopener"
+             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/[0.05]">
+            <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">open_in_new</span>Open Citizen Viewer
+          </a>
+        </div>
+      </section>
+
+      <section class="{{ card }} p-5">
+        <h2 class="flex items-center gap-2 font-semibold text-white text-sm mb-3">
+          <span class="material-symbols-outlined text-amber-400 text-[1.25rem]" aria-hidden="true">lightbulb</span>Announcement Tips</h2>
+        <ul class="text-xs text-slate-400 space-y-2 list-disc pl-5">
+          <li>Use clear and concise language.</li>
+          <li>Mark urgent messages as Emergency or Important.</li>
+          <li>Include date and time when relevant.</li>
+          <li>Target the right barangay or group.</li>
+        </ul>
+      </section>
+
+      <section class="{{ card }} p-4 flex items-center gap-3">
+        <span class="material-symbols-outlined text-slate-300 text-[2rem]" aria-hidden="true">shield</span>
+        <p class="text-xs text-slate-400">Information saves time.<br>Communication saves lives.</p>
+      </section>
+    </aside>
+  </div>
+
+  {# ------------------------------------------------ create / edit modal #}
+  <dialog id="ann-form-dialog" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-2xl max-h-[95vh] text-slate-100">
+    <form id="ann-form" novalidate class="rounded-2xl bg-[#0d1424] border border-white/10 shadow-2xl flex flex-col max-h-[95vh]">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <h2 id="ann-form-title" class="text-lg font-bold text-white">Create Announcement</h2>
+        <div class="flex items-center gap-2">
+          <select id="ann-template-picker" class="{{ input }} !w-auto !py-1.5 text-xs" aria-label="Start from a template"><option value="">Use template…</option></select>
+          <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+        </div>
+      </div>
+
+      <div class="overflow-y-auto px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div id="ann-form-error" class="sm:col-span-2 hidden p-3 rounded-lg bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert"></div>
+
+        <div class="sm:col-span-2">
+          <label for="ann-title" class="{{ label }}">Title <span class="text-red-400">*</span></label>
+          <input id="ann-title" name="title" maxlength="200" required class="{{ input }}" placeholder="e.g. Emergency Weather Advisory">
+          <p data-error-for="title" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="ann-message" class="{{ label }}">Message <span class="text-red-400">*</span></label>
+          <textarea id="ann-message" name="message" rows="5" maxlength="10000" required class="{{ input }}" placeholder="Full announcement text"></textarea>
+          <p data-error-for="message" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div>
+          <label for="ann-category" class="{{ label }}">Category <span class="text-red-400">*</span></label>
+          <select id="ann-category" name="category" required class="{{ input }}"><option value="">Select…</option>
+            {% for k, v in ann_options.categories.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+          <p data-error-for="category" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div>
+          <label for="ann-priority" class="{{ label }}">Priority <span class="text-red-400">*</span></label>
+          <select id="ann-priority" name="priority" required class="{{ input }}"><option value="">Select…</option>
+            {% for k, v in ann_options.priorities.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+          <p data-error-for="priority" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div>
+          <label for="ann-audience" class="{{ label }}">Target audience <span class="text-red-400">*</span></label>
+          <select id="ann-audience" name="target_audience" required class="{{ input }}">
+            {% for k, v in ann_options.audiences.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+          <p data-error-for="target_audience" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div data-show-for="barangay">
+          <label for="ann-barangay" class="{{ label }}">Barangay <span class="text-red-400">*</span></label>
+          <input id="ann-barangay" name="barangay" maxlength="100" class="{{ input }}" placeholder="e.g. Poblacion">
+          <p data-error-for="barangay" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <fieldset data-show-for="selected_groups" class="sm:col-span-2">
+          <legend class="{{ label }}">Groups <span class="text-red-400">*</span></legend>
+          <div class="flex flex-wrap gap-2">
+            {% for k, v in ann_options.groups.items() %}
+            <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0a1020] border border-white/10 text-xs cursor-pointer has-[:checked]:border-cyan-400">
+              <input type="checkbox" name="target_groups" value="{{ k }}" class="accent-red-600">{{ v }}</label>
+            {% endfor %}
+          </div>
+          <p data-error-for="target_groups" class="text-xs text-red-400 mt-1 hidden"></p>
+        </fieldset>
+        <div>
+          <label for="ann-published-at" class="{{ label }}">Publication date &amp; time</label>
+          <input id="ann-published-at" name="published_at" type="datetime-local" class="{{ input }} [color-scheme:dark]">
+          <p class="text-[0.6875rem] text-slate-500 mt-1">Leave empty to publish now. A future time schedules it.</p>
+          <p data-error-for="published_at" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div>
+          <label for="ann-expires-at" class="{{ label }}">Expiration date &amp; time <span class="text-slate-500 font-normal">(optional)</span></label>
+          <input id="ann-expires-at" name="expires_at" type="datetime-local" class="{{ input }} [color-scheme:dark]">
+          <p data-error-for="expires_at" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <div>
+          <label for="ann-status" class="{{ label }}">Status</label>
+          <select id="ann-status" name="status" class="{{ input }}">
+            {% for s in ann_options.statuses %}<option value="{{ s }}" {% if s == 'active' %}selected{% endif %}>{{ s|capitalize }}</option>{% endfor %}</select>
+          <p data-error-for="status" class="text-xs text-red-400 mt-1 hidden"></p>
+        </div>
+        <label class="flex items-center gap-3 self-end pb-2 cursor-pointer">
+          <input type="checkbox" name="is_pinned" class="w-4 h-4 accent-red-600">
+          <span class="text-sm text-slate-300">Pin as featured announcement</span>
+        </label>
+      </div>
+
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-5 py-4 border-t border-white/10">
+        <button type="button" data-close class="px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+        <button type="submit" value="draft" class="px-4 py-2.5 rounded-lg text-sm border border-white/15 text-white hover:bg-white/10">Save as Draft</button>
+        <button type="submit" value="publish" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-white">
+          <span data-spinner class="hidden w-4 h-4 border-2 border-[#050A12]/30 border-t-[#050A12] rounded-full animate-spin"></span>
+          <span data-publish-label>Publish Announcement</span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  {# ------------------------------------------------ details #}
+  <dialog id="ann-detail-dialog" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-xl text-slate-100">
+    <div class="rounded-2xl bg-[#0d1424] border border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <h2 class="text-lg font-bold text-white">Announcement details</h2>
+        <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div id="ann-detail-body" class="px-5 py-4 max-h-[70vh] overflow-y-auto"></div>
+    </div>
+  </dialog>
+
+  {# ------------------------------------------------ confirm #}
+  <dialog id="ann-confirm-dialog" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-sm text-slate-100">
+    <form method="dialog" class="rounded-2xl bg-[#0d1424] border border-white/10 shadow-2xl p-5">
+      <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-red-500 text-[1.75rem]" aria-hidden="true">warning</span>
+        <div>
+          <h2 id="ann-confirm-title" class="font-bold text-white"></h2>
+          <p id="ann-confirm-text" class="text-sm text-slate-400 mt-1"></p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-5">
+        <button value="cancel" class="px-4 py-2 rounded-lg text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+        <button value="ok" id="ann-confirm-ok" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-white"></button>
+      </div>
+    </form>
+  </dialog>
+
+  {# ------------------------------------------------ templates #}
+  <dialog id="ann-templates-dialog" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-2xl max-h-[95vh] text-slate-100">
+    <div class="rounded-2xl bg-[#0d1424] border border-white/10 shadow-2xl flex flex-col max-h-[95vh]">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <h2 class="text-lg font-bold text-white">Announcement Templates</h2>
+        <button type="button" data-close class="p-1 rounded hover:bg-white/10" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="overflow-y-auto px-5 py-4 flex flex-col gap-5">
+        <div id="ann-templates-list" class="flex flex-col gap-2"></div>
+        <form id="ann-template-form" novalidate class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-white/10 pt-4">
+          <h3 class="sm:col-span-2 text-sm font-semibold text-white">New template</h3>
+          <div class="sm:col-span-2"><label class="{{ label }}" for="tpl-name">Template name *</label>
+            <input id="tpl-name" name="name" maxlength="120" class="{{ input }}" placeholder="e.g. Typhoon signal raised">
+            <p data-error-for="name" class="text-xs text-red-400 mt-1 hidden"></p></div>
+          <div class="sm:col-span-2"><label class="{{ label }}" for="tpl-title">Title</label>
+            <input id="tpl-title" name="title" maxlength="200" class="{{ input }}"></div>
+          <div class="sm:col-span-2"><label class="{{ label }}" for="tpl-message">Message</label>
+            <textarea id="tpl-message" name="message" rows="3" class="{{ input }}"></textarea></div>
+          <div><label class="{{ label }}" for="tpl-category">Category *</label>
+            <select id="tpl-category" name="category" class="{{ input }}">
+              {% for k, v in ann_options.categories.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
+          <div><label class="{{ label }}" for="tpl-priority">Priority *</label>
+            <select id="tpl-priority" name="priority" class="{{ input }}">
+              {% for k, v in ann_options.priorities.items() %}<option value="{{ k }}" {% if k == 'medium' %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+          <div class="sm:col-span-2 flex justify-end">
+            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 !text-[#050A12] text-white">Save template</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+</div>

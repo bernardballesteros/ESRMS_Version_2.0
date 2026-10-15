@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="884" viewBox="0 0 1800 884">
+<rect width="1800" height="884" fill="#ffffff"/>
+<text x="900.0" y="46" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="bold" fill="#111827" text-anchor="middle" >Conceptual Framework of the Emergency SOS &amp; Response Management System (ESRMS)</text>
+<text x="900.0" y="76" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="middle" >Citizen Emergency App (Python, Flet) and Dispatcher Dashboard (Python, Flask) on a shared Supabase back end</text>
+<rect x="42" y="104" width="316" height="444" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<path d="M42,148 v-38 a6,6 0 0 1 6,-6 h304 a6,6 0 0 1 6,6 v38 z" fill="#1f2937"/>
+<text x="200.0" y="132.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">INPUT</text>
+<text x="58" y="178" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Citizen</text>
+<circle cx="66" cy="195" r="2.6" fill="#111827"/>
+<text x="78" y="200" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Sign-up and sign-in credentials</text>
+<circle cx="66" cy="217" r="2.6" fill="#111827"/>
+<text x="78" y="222" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Emergency category and type</text>
+<circle cx="66" cy="239" r="2.6" fill="#111827"/>
+<text x="78" y="244" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >GPS fix or manual location</text>
+<circle cx="66" cy="261" r="2.6" fill="#111827"/>
+<text x="78" y="266" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Description, name, contact no.</text>
+<text x="58" y="296" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Dispatcher</text>
+<circle cx="66" cy="313" r="2.6" fill="#111827"/>
+<text x="78" y="318" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Incident status updates</text>
+<circle cx="66" cy="335" r="2.6" fill="#111827"/>
+<text x="78" y="340" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Patient report, response request</text>
+<circle cx="66" cy="357" r="2.6" fill="#111827"/>
+<text x="78" y="362" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Announcements, hotline entries</text>
+<text x="58" y="392" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Hospital / Organization</text>
+<circle cx="66" cy="409" r="2.6" fill="#111827"/>
+<text x="78" y="414" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Report actions, bay status,</text>
+<text x="78" y="436" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >availability</text>
+<text x="58" y="466" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Administrator</text>
+<circle cx="66" cy="483" r="2.6" fill="#111827"/>
+<text x="78" y="488" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >User account actions</text>
+<line x1="362" y1="326.0" x2="382" y2="326.0" stroke="#1f2937" stroke-width="3"/>
+<path d="M390,326.0 l-12,-7 v14 z" fill="#1f2937"/>
+<rect x="392" y="104" width="316" height="444" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<path d="M392,148 v-38 a6,6 0 0 1 6,-6 h304 a6,6 0 0 1 6,6 v38 z" fill="#1f2937"/>
+<text x="550.0" y="132.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">ESRMS SYSTEM</text>
+<text x="408" y="178" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Citizen App (Android)</text>
+<circle cx="416" cy="195" r="2.6" fill="#111827"/>
+<text x="428" y="200" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Python, Flet</text>
+<circle cx="416" cy="217" r="2.6" fill="#111827"/>
+<text x="428" y="222" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >SOS, Announcements, Safety</text>
+<text x="428" y="244" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Radar, Account</text>
+<text x="408" y="274" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Dispatcher Dashboard (Web)</text>
+<circle cx="416" cy="291" r="2.6" fill="#111827"/>
+<text x="428" y="296" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Python, Flask, JavaScript</text>
+<circle cx="416" cy="313" r="2.6" fill="#111827"/>
+<text x="428" y="318" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Dispatch Center, Hospital</text>
+<text x="428" y="340" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Signal, Analytics, Announcements</text>
+<text x="408" y="370" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Hospital Portal (Web)</text>
+<circle cx="416" cy="387" r="2.6" fill="#111827"/>
+<text x="428" y="392" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Reports, trauma bays, staff</text>
+<text x="408" y="422" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Admin Portal (Web)</text>
+<circle cx="416" cy="439" r="2.6" fill="#111827"/>
+<text x="428" y="444" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Users, MFA reset approval</text>
+<text x="408" y="474" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Shared Back End</text>
+<circle cx="416" cy="491" r="2.6" fill="#111827"/>
+<text x="428" y="496" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Supabase (PostgreSQL)</text>
+<line x1="712" y1="326.0" x2="732" y2="326.0" stroke="#1f2937" stroke-width="3"/>
+<path d="M740,326.0 l-12,-7 v14 z" fill="#1f2937"/>
+<rect x="742" y="104" width="316" height="444" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<path d="M742,148 v-38 a6,6 0 0 1 6,-6 h304 a6,6 0 0 1 6,6 v38 z" fill="#1f2937"/>
+<text x="900.0" y="132.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">PROCESS</text>
+<circle cx="766" cy="173" r="2.6" fill="#111827"/>
+<text x="778" y="178" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Authenticate user; verify MFA</text>
+<circle cx="766" cy="195" r="2.6" fill="#111827"/>
+<text x="778" y="200" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Acquire and check GPS fix</text>
+<circle cx="766" cy="217" r="2.6" fill="#111827"/>
+<text x="778" y="222" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Build and validate SOS report</text>
+<circle cx="766" cy="239" r="2.6" fill="#111827"/>
+<text x="778" y="244" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Queue offline; retry until</text>
+<text x="778" y="266" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >confirmed by the database</text>
+<circle cx="766" cy="283" r="2.6" fill="#111827"/>
+<text x="778" y="288" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Reject duplicate and excess</text>
+<text x="778" y="310" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >reports</text>
+<circle cx="766" cy="327" r="2.6" fill="#111827"/>
+<text x="778" y="332" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Update incident status; log</text>
+<text x="778" y="354" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >events</text>
+<circle cx="766" cy="371" r="2.6" fill="#111827"/>
+<text x="778" y="376" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Recommend nearest suitable</text>
+<text x="778" y="398" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >organization</text>
+<circle cx="766" cy="415" r="2.6" fill="#111827"/>
+<text x="778" y="420" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Send and track patient reports</text>
+<text x="778" y="442" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >and response requests</text>
+<circle cx="766" cy="459" r="2.6" fill="#111827"/>
+<text x="778" y="464" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Publish targeted announcements</text>
+<circle cx="766" cy="481" r="2.6" fill="#111827"/>
+<text x="778" y="486" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Compute incident analytics</text>
+<circle cx="766" cy="503" r="2.6" fill="#111827"/>
+<text x="778" y="508" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Detect high-risk areas; publish</text>
+<text x="778" y="530" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >public-safe copy</text>
+<line x1="1062" y1="326.0" x2="1082" y2="326.0" stroke="#1f2937" stroke-width="3"/>
+<path d="M1090,326.0 l-12,-7 v14 z" fill="#1f2937"/>
+<rect x="1092" y="104" width="316" height="444" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<path d="M1092,148 v-38 a6,6 0 0 1 6,-6 h304 a6,6 0 0 1 6,6 v38 z" fill="#1f2937"/>
+<text x="1250.0" y="132.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">DATA / SERVICES</text>
+<text x="1108" y="178" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Supabase</text>
+<circle cx="1116" cy="195" r="2.6" fill="#111827"/>
+<text x="1128" y="200" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >PostgreSQL, row-level security</text>
+<circle cx="1116" cy="217" r="2.6" fill="#111827"/>
+<text x="1128" y="222" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Auth: email, Google, TOTP MFA</text>
+<circle cx="1116" cy="239" r="2.6" fill="#111827"/>
+<text x="1128" y="244" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Realtime change feeds</text>
+<circle cx="1116" cy="261" r="2.6" fill="#111827"/>
+<text x="1128" y="266" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Storage: photos, logos</text>
+<text x="1108" y="296" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Main Records</text>
+<circle cx="1116" cy="313" r="2.6" fill="#111827"/>
+<text x="1128" y="318" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Users; incidents; incident events</text>
+<circle cx="1116" cy="335" r="2.6" fill="#111827"/>
+<text x="1128" y="340" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Organizations; signals; bays</text>
+<circle cx="1116" cy="357" r="2.6" fill="#111827"/>
+<text x="1128" y="362" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Announcements; public risk areas</text>
+<circle cx="1116" cy="379" r="2.6" fill="#111827"/>
+<text x="1128" y="384" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Notification queue</text>
+<text x="1108" y="414" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Other Services</text>
+<circle cx="1116" cy="431" r="2.6" fill="#111827"/>
+<text x="1128" y="436" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Device GPS (flet-geolocator)</text>
+<circle cx="1116" cy="453" r="2.6" fill="#111827"/>
+<text x="1128" y="458" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Leaflet map: OpenStreetMap, Esri</text>
+<circle cx="1116" cy="475" r="2.6" fill="#111827"/>
+<text x="1128" y="480" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Resend email, Web Push*</text>
+<circle cx="1116" cy="497" r="2.6" fill="#111827"/>
+<text x="1128" y="502" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Phone SMS composer (fallback)</text>
+<line x1="1412" y1="326.0" x2="1432" y2="326.0" stroke="#1f2937" stroke-width="3"/>
+<path d="M1440,326.0 l-12,-7 v14 z" fill="#1f2937"/>
+<rect x="1442" y="104" width="316" height="444" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<path d="M1442,148 v-38 a6,6 0 0 1 6,-6 h304 a6,6 0 0 1 6,6 v38 z" fill="#1f2937"/>
+<text x="1600.0" y="132.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">OUTPUT</text>
+<text x="1458" y="178" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Citizen</text>
+<circle cx="1466" cy="195" r="2.6" fill="#111827"/>
+<text x="1478" y="200" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Confirmation with incident no.</text>
+<circle cx="1466" cy="217" r="2.6" fill="#111827"/>
+<text x="1478" y="222" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Report status (My Reports)</text>
+<circle cx="1466" cy="239" r="2.6" fill="#111827"/>
+<text x="1478" y="244" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Official announcements</text>
+<circle cx="1466" cy="261" r="2.6" fill="#111827"/>
+<text x="1478" y="266" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Safety Radar risk zones</text>
+<text x="1458" y="296" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Dispatcher</text>
+<circle cx="1466" cy="313" r="2.6" fill="#111827"/>
+<text x="1478" y="318" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Live incident list, map markers</text>
+<circle cx="1466" cy="335" r="2.6" fill="#111827"/>
+<text x="1478" y="340" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Recommended organizations</text>
+<circle cx="1466" cy="357" r="2.6" fill="#111827"/>
+<text x="1478" y="362" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Analytics, risk radar, CSV / PDF</text>
+<circle cx="1466" cy="379" r="2.6" fill="#111827"/>
+<text x="1478" y="384" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Incident history</text>
+<text x="1458" y="414" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Hospital / Organization</text>
+<circle cx="1466" cy="431" r="2.6" fill="#111827"/>
+<text x="1478" y="436" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >Incoming reports and requests</text>
+<text x="1458" y="466" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#111827" text-anchor="start" >Web Users</text>
+<circle cx="1466" cy="483" r="2.6" fill="#111827"/>
+<text x="1478" y="488" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="normal" fill="#111827" text-anchor="start" >In-app, email* and push* alerts</text>
+<line x1="200.0" y1="574" x2="1600.0" y2="574" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<line x1="200.0" y1="550" x2="200.0" y2="574" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<line x1="550.0" y1="550" x2="550.0" y2="574" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<line x1="900.0" y1="550" x2="900.0" y2="574" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<line x1="1250.0" y1="550" x2="1250.0" y2="574" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<line x1="1600.0" y1="550" x2="1600.0" y2="574" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<line x1="900.0" y1="574" x2="900.0" y2="602" stroke="#4b5563" stroke-width="1.6" stroke-dasharray="6 5" fill="none"/>
+<rect x="42" y="604" width="1716" height="224" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<path d="M42,648 v-38 a6,6 0 0 1 6,-6 h1704 a6,6 0 0 1 6,6 v38 z" fill="#1f2937"/>
+<text x="900.0" y="632.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">PYTHON OOP PRINCIPLES (as applied in ESRMS)</text>
+<rect x="62.0" y="668" width="402.5" height="140" rx="5" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="263.25" y="696" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#111827" text-anchor="middle" letter-spacing="0.4">ENCAPSULATION</text>
+<text x="263.25" y="722" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >Classes such as Backend, Session and Outbox keep</text>
+<text x="263.25" y="742" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >session tokens, the HTTP client and saved SOS</text>
+<text x="263.25" y="762" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >reports internal, exposing them only through their</text>
+<text x="263.25" y="782" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >methods.</text>
+<rect x="486.5" y="668" width="402.5" height="140" rx="5" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="687.75" y="696" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#111827" text-anchor="middle" letter-spacing="0.4">ABSTRACTION</text>
+<text x="687.75" y="722" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >Simple calls such as submit_incident() and</text>
+<text x="687.75" y="742" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >sign_in() hide token refresh, REST requests and</text>
+<text x="687.75" y="762" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >error handling from the screens that use them.</text>
+<rect x="911.0" y="668" width="402.5" height="140" rx="5" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="1112.25" y="696" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#111827" text-anchor="middle" letter-spacing="0.4">INHERITANCE</text>
+<text x="1112.25" y="722" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >Used in a limited way: custom error classes extend</text>
+<text x="1112.25" y="742" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >Python exceptions, and FlaskSessionStorage extends</text>
+<text x="1112.25" y="762" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >the Supabase storage base class.</text>
+<rect x="1335.5" y="668" width="402.5" height="140" rx="5" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="1536.75" y="696" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#111827" text-anchor="middle" letter-spacing="0.4">POLYMORPHISM</text>
+<text x="1536.75" y="722" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >Used in a limited way: FlaskSessionStorage</text>
+<text x="1536.75" y="742" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >overrides the storage methods, and Outbox works</text>
+<text x="1536.75" y="762" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#111827" text-anchor="middle" >with any storage that provides read and write.</text>
+<text x="42" y="858" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#4b5563" text-anchor="start" font-style="italic">* Implemented in the server; active only when Resend and VAPID keys are configured. Push notifications to the Citizen App are not implemented.</text>
+</svg>

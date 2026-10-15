@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block title %}Hospital Medical Reception{% endblock %}
+{% block tailwind_theme %}
+<script src="{{ url_for('static', filename='js/tailwind.dashboard.js') }}"></script>
+{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+{% block body_class %}bg-[#070b14] text-slate-100 font-sans min-h-screen antialiased{% endblock %}
+
+{% block header %}
+{% include "dashboard/partials/_topbar.html" %}
+{% endblock %}
+
+{# Hospital Medical Reception Dashboard. Every figure and report is loaded from /api/hospital
+   (app/routes/hospital.py) by static/js/hospital-portal.js; nothing here is sample data. #}
+{% block content %}
+{% set card = "rounded-xl bg-[#0b1220] border border-brand-border shadow-[0_0_18px_-8px_rgba(0,229,255,0.35)]" %}
+{% set input = "w-full px-3 py-2 rounded-lg bg-[#0a1020] border border-brand-border text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/40" %}
+{% set small = "px-2.5 py-1.5 rounded-md bg-[#0a1020] border border-brand-borderSubtle text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-cyan" %}
+{% set label = "block text-xs font-semibold text-slate-200 mb-1" %}
+{% set primary = "inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12] disabled:opacity-60" %}
+{% set ghost = "inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold border border-brand-cyan/50 text-brand-cyan hover:bg-brand-cyan/10" %}
+{% set dialog = "backdrop:bg-black/70 bg-transparent p-0 w-full text-slate-100" %}
+{% set chip = "px-2.5 py-1 rounded border border-brand-borderSubtle text-[0.6875rem] font-mono text-slate-300 hover:text-white aria-selected:text-brand-cyan aria-selected:border-brand-cyan/60 aria-selected:bg-brand-cyan/10" %}
+{% set err = "hidden text-xs text-red-400 mt-1" %}
+<div id="hospital-portal" class="esrms-focus flex-1 flex flex-col">
+  <script type="application/json" id="hospital-portal-config">{{ {
+    'options': options,
+    'api': {'base': '/api/hospital'},
+    'accountUrl': url_for('account.settings', section='profile'),
+    'securityUrl': url_for('account.settings', section='security'),
+  } | tojson }}</script>
+
+  {# ------------------------------------------------ identity bar #}
+  <section class="bg-[#0b101c] px-4 py-2.5 border-b border-brand-borderSubtle flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <span class="material-symbols-outlined text-brand-cyan text-[1.875rem]" aria-hidden="true">local_hospital</span>
+      <div class="min-w-0">
+        <h1 class="text-base md:text-lg font-extrabold tracking-tight text-white uppercase truncate">Hospital Medical Reception Dashboard</h1>
+        <p class="text-xs text-slate-300 truncate"><span id="hp-hospital-name" class="font-semibold text-white">Loading…</span> <span id="hp-me" class="text-slate-400"></span></p>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      {% if can_dispatch %}<a href="{{ url_for('main.dashboard') }}" class="text-xs text-brand-cyan underline">Dispatch Center</a>{% endif %}
+      <label class="flex items-center gap-1.5 text-[0.6875rem] font-mono text-slate-300">AVAILABILITY
+        <select id="hp-availability" class="{{ small }}" disabled>
+          {% for key, text in options.availability.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+        </select>
+      </label>
+      <div id="hp-connection" role="status" aria-live="polite"
+           class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/5 text-xs font-mono font-semibold text-amber-200">
+        <span class="material-symbols-outlined text-[1rem]" aria-hidden="true" data-icon>wifi_find</span>
+        <span data-text>Connecting…</span>
+        <span data-dot class="w-2 h-2 rounded-full bg-amber-400"></span>
+      </div>
+    </div>
+  </section>
+
+  {# ------------------------------------------------ navigation #}
+  <nav class="bg-[#0a0e18] border-b border-brand-borderSubtle px-4 flex items-center gap-1 overflow-x-auto shrink-0" role="tablist" aria-label="Hospital portal sections">
+    {% for key, text, icon in [('incoming', 'Incoming Reports', 'assignment'), ('signals', 'Hospital Signal', 'sensors'),
+                               ('completed', 'Completed Handoffs', 'task_alt'), ('history', 'History', 'history'), ('settings', 'Settings', 'settings')] %}
+    <button type="button" role="tab" data-view="{{ key }}" aria-selected="{{ 'true' if loop.first else 'false' }}"
+            class="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold whitespace-nowrap border-b-2 transition-colors
+                   aria-selected:text-brand-cyan aria-selected:border-brand-cyan aria-selected:bg-brand-cyan/5 text-slate-300 border-transparent hover:text-white">
+      <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">{{ icon }}</span>{{ text }}
+      {% if key == 'signals' %}<span id="hp-signal-badge" class="hidden px-1.5 rounded-full text-[0.625rem] font-mono bg-red-700 text-white"></span>{% endif %}
+    </button>
+    {% endfor %}
+  </nav>
+
+  <div class="flex-1 w-full max-w-[100rem] mx-auto px-3 sm:px-5 py-4">
+    {% include "partials/_flashes.html" %}
+    <div id="hp-message" class="hidden mb-3 p-4 rounded-xl border text-sm" role="alert"></div>
+
+    {# ------------------------------------------------ counters #}
+    <section id="hp-stats" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3" aria-label="Today at a glance" aria-live="polite">
+      {% for _ in range(6) %}<div class="h-[4.75rem] {{ card }} animate-pulse"></div>{% endfor %}
+    </section>
+
+    {# ------------------------------------------------ incoming / signals / completed / history share one layout #}
+    <div id="hp-reports" class="mt-3 grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+      <section class="lg:col-span-5 xl:col-span-4 {{ card }} p-3 min-w-0" aria-labelledby="hp-list-title">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+          <h2 id="hp-list-title" class="flex items-center gap-2 text-sm font-bold text-white"></h2>
+          <button type="button" id="hp-refresh" class="p-1 rounded text-slate-300 hover:text-brand-cyan" title="Refresh now" aria-label="Refresh reports">
+            <span class="material-symbols-outlined text-[1.125rem]" aria-hidden="true">refresh</span>
+          </button>
+        </div>
+        <p id="hp-list-note" class="px-1 mt-0.5 text-[0.6875rem] text-slate-400"></p>
+        <form id="hp-search" class="hidden mt-2 px-1" role="search">
+          <label class="relative block">
+            <span class="sr-only">Search patient reports</span>
+            <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[1rem]" aria-hidden="true">search</span>
+            <input type="search" name="q" maxlength="60" placeholder="Search patient, CAD, incident..." class="w-full pl-7 {{ small }}">
+          </label>
+        </form>
+        <div id="hp-filters" class="mt-2 px-1 flex flex-wrap gap-1" role="tablist" aria-label="Filter reports"></div>
+        <div id="hp-list" class="mt-2 flex flex-col gap-2 max-h-[70vh] overflow-y-auto pr-1" aria-live="polite" aria-busy="true">
+          {% for _ in range(3) %}<div class="h-24 rounded-lg bg-[#141a2b] border border-brand-borderSubtle animate-pulse"></div>{% endfor %}
+        </div>
+        <div id="hp-pager" class="mt-2 px-1 flex items-center justify-between gap-2 text-xs text-slate-400"></div>
+      </section>
+
+      <section id="hp-viewer" class="lg:col-span-7 xl:col-span-8 {{ card }} min-w-0" aria-live="polite" aria-label="Report viewer" tabindex="-1">
+        <div class="p-10 text-center text-slate-400">
+          <span class="material-symbols-outlined text-[2.5rem]" aria-hidden="true">assignment</span>
+          <p class="text-sm mt-1">Select a report to open it here.</p>
+        </div>
+      </section>
+    </div>
+
+    {# ------------------------------------------------ settings #}
+    <div id="hp-settings" class="hidden mt-3 grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
+      <section class="{{ card }} p-4" aria-labelledby="hp-profile-title">
+        <h2 id="hp-profile-title" class="flex items-center gap-2 text-sm font-bold text-white"><span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">domain</span>Hospital Profile</h2>
+        <p id="hp-profile-note" class="text-[0.6875rem] text-slate-400 mt-0.5"></p>
+        <form id="hp-profile" novalidate class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div id="hp-profile-error" class="sm:col-span-2 hidden p-3 rounded-lg bg-red-950/60 border border-red-500/40 text-red-200 text-sm" role="alert"></div>
+          {% for name, text, kind, span in [('hospital_name', 'Hospital Name', 'text', true), ('address', 'Address', 'text', true), ('city', 'City', 'text', false),
+                                            ('province', 'Province', 'text', false), ('country', 'Country', 'text', false), ('contact_number', 'Contact Number', 'tel', false),
+                                            ('ed_contact', 'Emergency Department Contact', 'text', false), ('official_email', 'Hospital Email', 'email', false)] %}
+          <div class="{{ 'sm:col-span-2' if span }}">
+            <label for="hpp-{{ name }}" class="{{ label }}">{{ text }}</label>
+            <input id="hpp-{{ name }}" name="{{ name }}" type="{{ kind }}" required class="{{ input }}">
+            <p data-error-for="{{ name }}" class="{{ err }}"></p>
+          </div>
+          {% endfor %}
+          <div class="sm:col-span-2 flex justify-end"><button type="submit" class="{{ primary }}">Save Hospital Profile</button></div>
+        </form>
+      </section>
+
+      <div class="flex flex-col gap-3">
+        <section class="{{ card }} p-4" aria-labelledby="hp-account-title">
+          <h2 id="hp-account-title" class="flex items-center gap-2 text-sm font-bold text-white"><span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">manage_accounts</span>Account Settings</h2>
+          <p class="text-xs text-slate-300 mt-1">Your own profile, password and multi-factor authentication are managed in ESRMS account settings.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <a href="{{ url_for('account.settings', section='profile') }}" class="{{ ghost }}">User Profile</a>
+            <a href="{{ url_for('account.settings', section='security') }}" class="{{ ghost }}">Password &amp; MFA</a>
+          </div>
+        </section>
+
+        <section class="{{ card }} p-4" aria-labelledby="hp-bays-title">
+          <div class="flex items-center justify-between gap-2">
+            <h2 id="hp-bays-title" class="flex items-center gap-2 text-sm font-bold text-white"><span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">bed</span>Trauma Bays &amp; Rooms</h2>
+            <button type="button" id="hp-bay-add" class="hidden {{ ghost }} !py-1 !px-2.5 !text-xs">Add bay</button>
+          </div>
+          <ul id="hp-bay-list" class="mt-2 flex flex-col gap-1.5"></ul>
+        </section>
+
+        <section class="{{ card }} p-4" aria-labelledby="hp-staff-title">
+          <div class="flex items-center justify-between gap-2">
+            <h2 id="hp-staff-title" class="flex items-center gap-2 text-sm font-bold text-white"><span class="material-symbols-outlined text-brand-cyan text-[1.25rem]" aria-hidden="true">groups</span>Hospital Staff</h2>
+            <button type="button" id="hp-staff-add" class="hidden {{ ghost }} !py-1 !px-2.5 !text-xs">Add staff</button>
+          </div>
+          <ul id="hp-staff-list" class="mt-2 flex flex-col gap-1.5"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  {# ------------------------------------------------ dialogs #}
+  <dialog id="hp-unable" class="{{ dialog }} max-w-md" aria-labelledby="hp-unable-title">
+    <form id="hp-unable-form" novalidate class="rounded-xl bg-[#0d1424] border border-red-500/40 shadow-2xl">
+      <h2 id="hp-unable-title" class="px-5 py-4 border-b border-brand-borderSubtle text-base font-bold text-white">Unable to Receive</h2>
+      <div class="px-5 py-4">
+        <p id="hp-unable-text" class="text-sm text-slate-300"></p>
+        <fieldset class="mt-3">
+          <legend class="text-xs font-semibold text-slate-200 mb-1.5">Reason <span class="text-red-400">*</span></legend>
+          {% for reason in options.rejectionReasons %}
+          <label class="flex items-center gap-2 py-1 text-sm text-slate-100"><input type="radio" name="choice" value="{{ reason }}" class="accent-cyan-400"> {{ reason }}</label>
+          {% endfor %}
+        </fieldset>
+        <label class="{{ label }} mt-2" for="hp-unable-detail">Details</label>
+        <textarea id="hp-unable-detail" name="detail" rows="2" maxlength="200" class="{{ input }}"></textarea>
+        <p id="hp-unable-error" class="{{ err }}" role="alert"></p>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-md text-sm font-semibold bg-red-700 hover:bg-red-600 text-white">Submit: Unable to Receive</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="hp-complete" class="{{ dialog }} max-w-lg" aria-labelledby="hp-complete-title">
+    <form id="hp-complete-form" novalidate class="rounded-xl bg-[#0d1424] border border-emerald-500/40 shadow-2xl">
+      <h2 id="hp-complete-title" class="px-5 py-4 border-b border-brand-borderSubtle text-base font-bold text-white">Complete Handoff</h2>
+      <div class="px-5 py-4">
+        <dl id="hp-complete-summary" class="text-sm"></dl>
+        <label class="{{ label }} mt-3" for="hp-complete-staff">Receiving Nurse / Doctor <span class="text-red-400">*</span></label>
+        <input id="hp-complete-staff" name="receiving_staff" maxlength="120" required class="{{ input }}">
+        <p data-error-for="receiving_staff" class="{{ err }}"></p>
+        <label class="{{ label }} mt-3" for="hp-complete-notes">Clinical / Handoff Notes</label>
+        <textarea id="hp-complete-notes" name="handoff_notes" rows="4" maxlength="{{ options.handoffNotesLimit }}" class="{{ input }}"></textarea>
+        <p data-error-for="handoff_notes" class="{{ err }}"></p>
+        <p class="mt-2 text-[0.6875rem] text-slate-400">Completing the handoff archives this report. It becomes read-only and its bay is marked for cleaning.</p>
+        <p id="hp-complete-error" class="{{ err }}" role="alert"></p>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+        <button type="submit" class="{{ primary }}"><span class="material-symbols-outlined text-[1.125rem]" aria-hidden="true">task_alt</span>Complete Handoff</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="hp-bay-dialog" class="{{ dialog }} max-w-sm" aria-labelledby="hp-bay-dialog-title">
+    <form id="hp-bay-form" novalidate class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <h2 id="hp-bay-dialog-title" class="px-5 py-4 border-b border-brand-borderSubtle text-base font-bold text-white">Add Bay</h2>
+      <div class="px-5 py-4">
+        <label class="{{ label }}" for="hp-bay-name">Name <span class="text-red-400">*</span></label>
+        <input id="hp-bay-name" name="name" maxlength="60" required class="{{ input }}" placeholder="Trauma Bay 4">
+        <p data-error-for="name" class="{{ err }}"></p>
+        <label class="{{ label }} mt-3" for="hp-bay-kind">Type</label>
+        <select id="hp-bay-kind" name="kind" class="{{ input }}">
+          {% for key, text in options.bayKinds.items() %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+        </select>
+        <p id="hp-bay-error" class="{{ err }}" role="alert"></p>
+      </div>
+      <div class="flex justify-between gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" id="hp-bay-delete" class="hidden px-3 py-2 rounded-md text-sm text-red-300 hover:bg-red-500/10">Delete</button>
+        <span class="ml-auto flex gap-2">
+          <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+          <button type="submit" class="{{ primary }}">Save</button>
+        </span>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="hp-staff-dialog" class="{{ dialog }} max-w-md" aria-labelledby="hp-staff-dialog-title">
+    <form id="hp-staff-form" novalidate class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl">
+      <h2 id="hp-staff-dialog-title" class="px-5 py-4 border-b border-brand-borderSubtle text-base font-bold text-white">Add Staff Account</h2>
+      <div class="px-5 py-4 grid grid-cols-1 gap-3">
+        <div data-new-only>
+          <label class="{{ label }}" for="hp-staff-email">Email <span class="text-red-400">*</span></label>
+          <input id="hp-staff-email" name="email" type="email" maxlength="254" autocomplete="off" class="{{ input }}">
+          <p data-error-for="email" class="{{ err }}"></p>
+        </div>
+        <div data-new-only>
+          <label class="{{ label }}" for="hp-staff-name">Full name <span class="text-red-400">*</span></label>
+          <input id="hp-staff-name" name="full_name" maxlength="120" autocomplete="off" class="{{ input }}">
+          <p data-error-for="full_name" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label class="{{ label }}" for="hp-staff-role">Role <span class="text-red-400">*</span></label>
+          <select id="hp-staff-role" name="staff_role" class="{{ input }}">
+            {% for key, text in options.staffRoles.items() %}<option value="{{ key }}" {{ 'selected' if key == 'reception' }}>{{ text }}</option>{% endfor %}
+          </select>
+          <p data-error-for="staff_role" class="{{ err }}"></p>
+        </div>
+        <div>
+          <label class="{{ label }}" for="hp-staff-position">Position <span class="font-normal text-slate-400">(optional)</span></label>
+          <input id="hp-staff-position" name="position" maxlength="80" class="{{ input }}">
+        </div>
+        <div data-new-only>
+          <label class="{{ label }}" for="hp-staff-password">Temporary password <span class="text-red-400">*</span></label>
+          <input id="hp-staff-password" name="password" type="text" autocomplete="off" minlength="{{ options.minPassword }}" class="{{ input }} font-mono">
+          <p class="text-[0.6875rem] text-slate-400 mt-1">At least {{ options.minPassword }} characters with upper and lower case letters and a number. Share it privately; the staff member should change it after signing in. Not needed if the email already has an ESRMS account.</p>
+          <p data-error-for="password" class="{{ err }}"></p>
+        </div>
+        <p id="hp-staff-error" class="{{ err }}" role="alert"></p>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-4 border-t border-brand-borderSubtle">
+        <button type="button" data-close class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-white/10">Cancel</button>
+        <button type="submit" class="{{ primary }}">Save</button>
+      </div>
+    </form>
+  </dialog>
+</div>
+{% set notify_watch = false %}
+{% include "dashboard/partials/_notify_config.html" %}
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="{{ url_for('static', filename='js/announcements-realtime.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+<script src="{{ url_for('static', filename='js/hospital-common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/hospital-portal.js') }}"></script>
+{% endblock %}

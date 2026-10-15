@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESRMS | Emergency SOS & Response Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            bgDark: '#050A12',
+            cardBg: '#0D1420',
+            cardSubtle: '#101A27',
+            cyanAccent: '#00D9FF',
+            blueSecondary: '#1685FF',
+            textLight: '#F1F5F9',
+            textMuted: '#8B98A8',
+            borderGlow: 'rgba(0, 217, 255, 0.22)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #050A12;
+      color: #F1F5F9;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glows */
+    .bg-grid-tech {
+      background-image: radial-gradient(rgba(0, 217, 255, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .ambient-radial {
+      background: radial-gradient(circle at 50% 50%, rgba(22, 133, 255, 0.12) 0%, rgba(0, 217, 255, 0.05) 35%, rgba(5, 10, 18, 0) 70%);
+    }
+
+    .cyan-glow {
+      box-shadow: 0 0 30px -5px rgba(0, 217, 255, 0.25);
+    }
+
+    .cyan-glow-subtle {
+      box-shadow: 0 0 25px -4px rgba(0, 217, 255, 0.12);
+    }
+
+    .btn-glow {
+      box-shadow: 0 4px 20px -2px rgba(0, 217, 255, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-glow:hover {
+      box-shadow: 0 6px 28px rgba(0, 217, 255, 0.65);
+      transform: translateY(-2px);
+    }
+
+    .corner-bracket {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: rgba(0, 217, 255, 0.45);
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(13, 20, 32, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 217, 255, 0.18);
+    }
+
+    /* Custom input focus */
+    .input-field:focus-within {
+      border-color: #00D9FF;
+      box-shadow: 0 0 0 1px #00D9FF, 0 0 16px -2px rgba(0, 217, 255, 0.3);
+    }
+
+    /* Pulse animation */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 3s infinite ease-in-out;
+    }
+
+    @keyframes radar-sweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .radar-sweep {
+      animation: radar-sweep 6s linear infinite;
+    }
+  </style>
+</head>
+<body class="relative flex flex-col justify-between items-center selection:bg-cyan-500 selection:text-black">
+
+  <!-- Background Layer -->
+  <div class="fixed inset-0 bg-grid-tech pointer-events-none opacity-40"></div>
+  <div class="fixed inset-0 ambient-radial pointer-events-none"></div>
+
+  <!-- Subtle Top Command Bar -->
+  <header class="w-full border-b border-cyan-500/10 bg-[#070D18]/80 backdrop-blur-md px-6 py-3 flex items-center justify-between text-xs font-mono tracking-wider z-20">
+    <div class="flex items-center gap-3">
+      <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+      <span class="text-cyanAccent font-semibold">ESRMS GATEWAY ONLINE</span>
+      <span class="text-gray-500 hidden sm:inline">|</span>
+      <span class="text-gray-400 hidden sm:inline">PAC-DEFCON-4 ROUTE: 104.28.19.2</span>
+    </div>
+    <div class="flex items-center gap-4 text-gray-400">
+      <span class="text-gray-500 hidden md:inline">ENCRYPTION: AES-GCM-256</span>
+      <span class="bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded text-[11px] font-medium" id="live-clock">UTC 00:00:00</span>
+    </div>
+  </header>
+
+  <!-- Main Centered Content (Wireframe 2-Column Exact Layout) -->
+  <main class="relative z-10 w-full max-w-5xl mx-auto px-4 py-8 md:py-12 flex-1 flex items-center justify-center">
+    
+    <div class="relative w-full max-w-4xl p-2 sm:p-6 md:p-10 rounded-3xl border border-cyan-500/15 bg-gradient-to-b from-[#0a111e]/90 to-[#070c16]/95 cyan-glow-subtle backdrop-blur-xl">
+      
+      <!-- Tech Corner Brackets -->
+      <div class="corner-bracket top-3 left-3 border-t-2 border-l-2"></div>
+      <div class="corner-bracket top-3 right-3 border-t-2 border-r-2"></div>
+      <div class="corner-bracket bottom-3 left-3 border-b-2 border-l-2"></div>
+      <div class="corner-bracket bottom-3 right-3 border-b-2 border-r-2"></div>
+
+      <!-- Two Column Layout: Left Logo Branding, Right Login Card -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+        <!-- ================= LEFT COLUMN: EMERGENCY BRANDING & LOGO ================= -->
+        <section class="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left space-y-6">
+          
+          <!-- Logo Container (~150x150 rounded, cyan glow, pulse icon) -->
+          <div class="relative group">
+            <!-- Ambient Glow behind logo -->
+            <div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-[28px] opacity-25 blur-lg group-hover:opacity-45 transition duration-500"></div>
+
+            <div class="relative w-[150px] h-[150px] rounded-[22px] bg-[#0c1422] border border-cyan-400/40 p-3 flex items-center justify-center shadow-2xl cyan-glow overflow-hidden">
+              
+              <!-- Subtle Radar Grid inside logo -->
+              <div class="absolute inset-0 opacity-15">
+                <div class="absolute inset-2 rounded-full border border-cyan-300"></div>
+                <div class="absolute inset-8 rounded-full border border-cyan-300"></div>
+                <div class="absolute top-0 bottom-0 left-1/2 w-[1px] bg-cyan-300"></div>
+                <div class="absolute left-0 right-0 top-1/2 h-[1px] bg-cyan-300"></div>
+              </div>
+
+              <!-- Radar sweep gradient -->
+              <div class="absolute inset-0 rounded-[22px] pointer-events-none opacity-20 radar-sweep" style="background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(0,217,255,0.7) 360deg);"></div>
+
+              <!-- High-Tech SVG Emblem -->
+              <svg class="w-24 h-24 relative z-10 filter drop-shadow-[0_0_12px_rgba(0,217,255,0.8)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer Beacon Ring -->
+                <circle cx="50" cy="50" r="42" stroke="#00D9FF" stroke-width="1.8" stroke-dasharray="5 3" opacity="0.6"/>
+                <circle cx="50" cy="50" r="33" stroke="#1685FF" stroke-width="2" opacity="0.4"/>
+                
+                <!-- Cross / Cardinal Marks -->
+                <path d="M50 10V18M50 82V90M10 50H18M82 50H90" stroke="#00D9FF" stroke-width="2.5" stroke-linecap="round"/>
+                
+                <!-- Inner Shield/Ring -->
+                <circle cx="50" cy="50" r="22" fill="#08101C" stroke="#00D9FF" stroke-width="2.5"/>
+                
+                <!-- Heartbeat / Emergency Signal Pulse -->
+                <path d="M34 50H40L44 38L50 62L56 46L60 50H66" stroke="#00D9FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                
+                <!-- Glowing Node -->
+                <circle cx="50" cy="27" r="3" fill="#00D9FF" class="pulse-ring"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Brand Title & Subtitle -->
+          <div class="space-y-2">
+            <h1 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-white flex items-center justify-center md:justify-start gap-2">
+              <span>ESRMS</span>
+              <span class="text-xs px-2 py-0.5 rounded font-mono font-medium bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 tracking-wider">v4.8</span>
+            </h1>
+            <p class="text-sm lg:text-base text-gray-300 font-medium leading-snug">
+              Emergency <span class="text-cyanAccent font-semibold">SOS</span> & Response Management System
+            </p>
+            <p class="text-xs text-textMuted max-w-xs leading-relaxed">
+              Unified command center portal for certified telecommunicators, 911 dispatchers, and first responders.
+            </p>
+          </div>
+
+          <!-- Security Pill Badge -->
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>SECURE RESPONSE NETWORK</span>
+          </div>
+
+          <!-- Quick System Indicators (Desktop) -->
+          <div class="hidden md:grid grid-cols-2 gap-3 w-full pt-2 font-mono text-[11px] text-gray-400">
+            <div class="p-2.5 rounded-lg bg-[#08101a] border border-cyan-500/10">
+              <span class="text-gray-500 block text-[9px]">CLEARANCE</span>
+              <span class="text-cyan-200 font-semibold">LEVEL 4 CJIS AUTH</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-[#08101a] border border-cyan-500/10">
+              <span class="text-gray-500 block text-[9px]">ENCRYPTED RELAY</span>
+              <span class="text-emerald-400 font-semibold">ACTIVE 99.99%</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= RIGHT COLUMN: LOGIN CARD (EXACT WIREFRAME MATCH) ================= -->
+        <section class="md:col-span-7 flex justify-center">
+          
+          <div class="w-full max-w-[420px] rounded-[20px] p-6 sm:p-8 bg-[#0D1420]/90 border border-cyan-500/25 cyan-glow shadow-2xl relative">
+            
+            <!-- Card Header -->
+            <div class="mb-6">
+              <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-white tracking-tight">Welcome Back</h2>
+                <div class="w-7 h-7 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </div>
+              </div>
+              <p class="text-xs text-textMuted mt-1">Sign in to access the emergency response network.</p>
+            </div>
+
+            <!-- Dynamic Notification / Error Banner (Initially Hidden) -->
+            <div id="error-banner" class="hidden mb-4 p-3 rounded-lg bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-start gap-2.5 animate-fadeIn">
+              <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div id="error-message">Authentication failed. Please verify credentials.</div>
+            </div>
+
+            <!-- Form conforming exactly to wireframe hierarchy -->
+            <form id="login-form" class="space-y-4" onsubmit="handleSignIn(event)">
+              
+              <!-- 1. Email Field -->
+              <div class="space-y-1.5 text-left">
+                <label for="email" class="block text-xs font-medium text-gray-300 tracking-wide">Email</label>
+                <div class="input-field relative rounded-[10px] bg-[#070D18] border border-cyan-500/20 transition-all duration-200">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    placeholder="username@gmail.com" 
+                    class="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-[10px] text-sm text-white placeholder-gray-500 focus:outline-none"
+                    value="username@gmail.com"
+                  />
+                </div>
+              </div>
+
+              <!-- 2. Password Field -->
+              <div class="space-y-1.5 text-left">
+                <div class="flex items-center justify-between">
+                  <label for="password" class="block text-xs font-medium text-gray-300 tracking-wide">Password</label>
+                </div>
+                <div class="input-field relative rounded-[10px] bg-[#070D18] border border-cyan-500/20 transition-all duration-200">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                  </div>
+                  <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="eg.12345678" 
+                    class="w-full pl-10 pr-11 py-2.5 bg-transparent rounded-[10px] text-sm text-white placeholder-gray-500 focus:outline-none"
+                  />
+                  <!-- Toggle Visibility -->
+                  <button 
+                    type="button" 
+                    id="toggle-password" 
+                    onclick="togglePasswordVisibility()" 
+                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-cyanAccent transition-colors focus:outline-none"
+                    title="Toggle password visibility"
+                  >
+                    <svg id="eye-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. Forgot Password Link -->
+              <div class="flex justify-start pt-0.5">
+                <a href="#forgot-password" onclick="handleForgotPassword(event)" class="text-xs text-cyanAccent hover:text-cyan-300 hover:underline transition-colors font-medium">
+                  Forgot Password?
+                </a>
+              </div>
+
+              <!-- 4. Sign In Button (Large full width) -->
+              <div class="pt-2">
+                <button 
+                  type="submit" 
+                  id="signin-btn" 
+                  class="btn-glow w-full py-3 px-4 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] text-[#050A12] font-semibold text-sm tracking-wide flex items-center justify-center gap-2 cursor-pointer transition-transform duration-200"
+                >
+                  <span id="btn-text">Sign in</span>
+                  <svg id="btn-spinner" class="hidden animate-spin w-4 h-4 text-[#050A12]" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 5. "or continue with" Divider -->
+              <div class="relative py-2 flex items-center justify-center">
+                <div class="border-t border-gray-700/60 w-full"></div>
+                <span class="bg-[#0D1420] px-3 text-[11px] text-textMuted uppercase tracking-wider font-mono whitespace-nowrap">
+                  or continue with
+                </span>
+                <div class="border-t border-gray-700/60 w-full"></div>
+              </div>
+
+              <!-- 6. Google Button (Full width outlined) -->
+              <div>
+                <button 
+                  type="button" 
+                  onclick="handleGoogleSignIn()" 
+                  class="w-full py-2.5 px-4 rounded-[10px] bg-[#070D18]/70 hover:bg-[#101A27] border border-gray-700 hover:border-cyan-500/50 text-white text-xs sm:text-sm font-medium flex items-center justify-center gap-3 transition-all duration-200 hover:shadow-[0_0_15px_rgba(0,217,255,0.15)] group"
+                >
+                  <!-- Google G Icon -->
+                  <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                  </svg>
+                  <span class="group-hover:text-cyan-200 transition-colors">Continue with Google</span>
+                </button>
+              </div>
+
+              <!-- 7. Register Text at Bottom -->
+              <div class="text-center pt-2">
+                <p class="text-xs text-textMuted">
+                  Don't have an account? 
+                  <a href="#register" onclick="handleRegister(event)" class="text-cyanAccent hover:text-cyan-300 font-medium hover:underline transition-colors ml-1">
+                    Register for free
+                  </a>
+                </p>
+              </div>
+
+            </form>
+
+            <!-- Card Bottom Tech Footer -->
+            <div class="mt-6 pt-4 border-t border-cyan-500/10 flex items-center justify-between text-[10px] font-mono text-gray-500">
+              <span class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                CJIS AUTH 4.0
+              </span>
+              <span>NODE: PAC-911-CORE</span>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Global Security Monospace Footer -->
+  <footer class="w-full py-4 px-6 border-t border-cyan-500/10 bg-[#040810]/90 text-center z-10">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-gray-500">
+      <div class="flex items-center gap-2">
+        <svg class="w-3.5 h-3.5 text-cyanAccent/70 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        <span class="text-gray-400">SECURE CONNECTION • ENCRYPTED • ESRMS NETWORK</span>
+      </div>
+      <div>
+        <span>AUTHORIZED EMERGENCY RESPONSE PERSONNEL ONLY</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript logic -->
+  <script>
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      const utcString = now.toUTCString().split(' ')[4];
+      const clockEl = document.getElementById('live-clock');
+      if (clockEl) {
+        clockEl.textContent = 'UTC ' + utcString;
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Toggle Password Visibility
+    let isPasswordVisible = false;
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eye-icon');
+      isPasswordVisible = !isPasswordVisible;
+      
+      if (isPasswordVisible) {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+        `;
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        `;
+      }
+    }
+
+    // Handle Form Submit with Loading State
+    function handleSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const btn = document.getElementById('signin-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const errorBanner = document.getElementById('error-banner');
+      const errorMessage = document.getElementById('error-message');
+
+      errorBanner.classList.add('hidden');
+
+      // Validation
+      if (!password) {
+        errorMessage.textContent = "Please enter your tactical access key or password.";
+        errorBanner.classList.remove('hidden');
+        return;
+      }
+
+      // Simulate Authentication Handshake
+      btn.disabled = true;
+      btn.classList.add('opacity-80', 'cursor-wait');
+      btnText.textContent = "Authenticating Gateway...";
+      btnSpinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-80', 'cursor-wait');
+        btnSpinner.classList.add('hidden');
+        
+        if (password.length < 6) {
+          btnText.textContent = "Sign in";
+          errorMessage.textContent = "Access Denied: Clearance credentials must exceed 5 characters.";
+          errorBanner.classList.remove('hidden');
+        } else {
+          btnText.textContent = "Access Granted";
+          btn.classList.remove('from-[#00D9FF]', 'to-[#1685FF]');
+          btn.classList.add('from-emerald-400', 'to-teal-500');
+          setTimeout(() => {
+            alert("Redirecting to /dashboard with secure token...");
+            btnText.textContent = "Sign in";
+            btn.classList.remove('from-emerald-400', 'to-teal-500');
+            btn.classList.add('from-[#00D9FF]', 'to-[#1685FF]');
+          }, 800);
+        }
+      }, 1200);
+    }
+
+    function handleGoogleSignIn() {
+      const errorBanner = document.getElementById('error-banner');
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.textContent = "Connecting to GovCloud Federated Identity Provider (Google SSO)...";
+      errorBanner.classList.remove('hidden', 'bg-red-950/50', 'border-red-500/40', 'text-red-200');
+      errorBanner.classList.add('bg-cyan-950/60', 'border-cyan-500/40', 'text-cyan-200');
+      setTimeout(() => {
+        errorBanner.classList.add('hidden');
+        errorBanner.classList.remove('bg-cyan-950/60', 'border-cyan-500/40', 'text-cyan-200');
+        errorBanner.classList.add('bg-red-950/50', 'border-red-500/40', 'text-red-200');
+      }, 3000);
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      const errorBanner = document.getElementById('error-banner');
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.textContent = "Tactical password reset initiated. Contact Dispatch TAC Support or check dispatch email.";
+      errorBanner.classList.remove('hidden', 'bg-red-950/50', 'border-red-500/40', 'text-red-200');
+      errorBanner.classList.add('bg-cyan-950/60', 'border-cyan-500/40', 'text-cyan-200');
+      setTimeout(() => {
+        errorBanner.classList.add('hidden');
+        errorBanner.classList.remove('bg-cyan-950/60', 'border-cyan-500/40', 'text-cyan-200');
+        errorBanner.classList.add('bg-red-950/50', 'border-red-500/40', 'text-red-200');
+      }, 4000);
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const errorBanner = document.getElementById('error-banner');
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.textContent = "Routing to Emergency Personnel Registration (/register)... Clearance verification required.";
+      errorBanner.classList.remove('hidden', 'bg-red-950/50', 'border-red-500/40', 'text-red-200');
+      errorBanner.classList.add('bg-cyan-950/60', 'border-cyan-500/40', 'text-cyan-200');
+      setTimeout(() => {
+        errorBanner.classList.add('hidden');
+        errorBanner.classList.remove('bg-cyan-950/60', 'border-cyan-500/40', 'text-cyan-200');
+        errorBanner.classList.add('bg-red-950/50', 'border-red-500/40', 'text-red-200');
+      }, 4000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+[project]
+name = "esrms-citizen"
+version = "0.1.1"
+description = "ESRMS Citizen Emergency App - SOS reports and official announcements"
+requires-python = ">=3.10"
+dependencies = [
+    "flet==1.0.3",
+    "flet-geolocator==1.0.3",
+    "flet-permission-handler==1.0.3",
+    "flet-camera==1.0.3",
+    "httpx>=0.28",
+    "websockets>=13",
+]
+
+[dependency-groups]
+dev = ["flet[all]==1.0.3", "pytest>=8"]
+
+[tool.flet]
+org = "ph.esrms"
+product = "ESRMS Citizen"
+company = "ESRMS"
+copyright = "ESRMS"
+
+[tool.flet.app]
+path = "src"
+
+[tool.flet.android]
+# Launcher icon: src/assets/icon.png (scripts/make_icon.py), on the app's dark panel colour.
+adaptive_icon_background = "#0C1422"
+# Fine/coarse (foreground) location for SOS reports, notifications for Android 13+.
+# Background location is deliberately NOT requested: the app reads GPS only while open.
+[tool.flet.android.permission]
+"android.permission.INTERNET" = true
+"android.permission.ACCESS_FINE_LOCATION" = true
+"android.permission.ACCESS_COARSE_LOCATION" = true
+"android.permission.POST_NOTIFICATIONS" = true
+# Only for "Take a Picture" on the SOS form; asked when the citizen presses it.
+"android.permission.CAMERA" = true
+
+[tool.flet.android.deep_linking]
+# Google sign-in returns to ph.esrms.citizen://auth/callback (esrms/oauth.py REDIRECT_URL).
+scheme = "ph.esrms.citizen"
+host = "auth"
+
+[tool.flet.android.feature]
+# "false" = not required: still installable on devices without GPS; manual location covers them.
+"android.hardware.location.gps" = false
+"android.hardware.location.network" = false
+"android.hardware.camera" = false
+
+[tool.flet.flutter.pubspec.dependency_overrides]
+# image 4.11 calls ZLibDecoder.decodeLazy, which archive 4.3.0 lacks; pin until they agree.
+image = "4.5.4"
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "tests"]
+testpaths = ["tests"]

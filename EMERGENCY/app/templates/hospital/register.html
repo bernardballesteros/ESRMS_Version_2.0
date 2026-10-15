@@ -1,0 +1,75 @@
+{% extends "hospital/_auth_shell.html" %}
+{% block title %}Register Your Hospital{% endblock %}
+{% block card %}
+{% set field = "w-full px-3.5 py-2.5 rounded-[10px] bg-[#070D18] border text-sm text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50" %}
+{% macro input(name, label, type='text', placeholder='', required=true, autocomplete='off', span=false, hint='', attrs='') %}
+<div class="{{ 'sm:col-span-2' if span }}">
+  <label for="{{ name }}" class="block text-xs font-medium text-slate-200 mb-1.5">{{ label }}{% if required %} <span class="text-red-400">*</span>{% else %} <span class="font-normal text-slate-400">(optional)</span>{% endif %}</label>
+  <input type="{{ type }}" id="{{ name }}" name="{{ name }}" {{ 'required' if required }} autocomplete="{{ autocomplete }}" placeholder="{{ placeholder }}"
+         {% if type != 'password' %}value="{{ form.get(name, '') }}"{% endif %} {{ attrs|safe }}
+         {% if errors.get(name) %}aria-invalid="true" aria-describedby="{{ name }}-error"{% endif %}
+         class="{{ field }} {{ 'border-red-500/70' if errors.get(name) else 'border-cyan-500/20' }}">
+  {% if hint and not errors.get(name) %}<p class="text-[0.6875rem] text-slate-400 mt-1">{{ hint }}</p>{% endif %}
+  {% if errors.get(name) %}<p id="{{ name }}-error" class="text-xs text-red-400 mt-1">{{ errors[name] }}</p>{% endif %}
+</div>
+{% endmacro %}
+<div class="w-full max-w-3xl rounded-[20px] p-6 sm:p-8 bg-[#0D1420]/90 border border-cyan-500/25 cyan-glow shadow-2xl">
+  <h2 class="text-xl font-bold text-white tracking-tight">Register Your Hospital — Free</h2>
+  <p class="text-xs text-slate-300 mt-1 mb-5">Create your hospital's receiving account. There is no charge. Fields marked <span class="text-red-400">*</span> are required.</p>
+  {% include "partials/_flashes.html" %}
+  <form method="post" action="{{ url_for('hospital_auth.register') }}" novalidate class="space-y-6">
+    <fieldset>
+      <legend class="text-[0.6875rem] font-mono text-cyanAccent tracking-widest mb-3">HOSPITAL INFORMATION</legend>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {{ input('hospital_name', 'Hospital Name', autocomplete='organization') }}
+        <div>
+          <label for="hospital_type" class="block text-xs font-medium text-slate-200 mb-1.5">Hospital Type <span class="text-red-400">*</span></label>
+          <select id="hospital_type" name="hospital_type" required {% if errors.get('hospital_type') %}aria-invalid="true"{% endif %}
+                  class="{{ field }} {{ 'border-red-500/70' if errors.get('hospital_type') else 'border-cyan-500/20' }}">
+            <option value="">Select type</option>
+            {% for key, text in hospital_types.items() %}<option value="{{ key }}" {{ 'selected' if form.get('hospital_type') == key }}>{{ text }}</option>{% endfor %}
+          </select>
+          {% if errors.get('hospital_type') %}<p class="text-xs text-red-400 mt-1">{{ errors['hospital_type'] }}</p>{% endif %}
+        </div>
+        {{ input('address', 'Hospital Address', autocomplete='street-address', span=true) }}
+        {{ input('city', 'City', autocomplete='address-level2') }}
+        {{ input('province', 'Province', autocomplete='address-level1') }}
+        {{ input('country', 'Country', autocomplete='country-name', placeholder='Philippines') }}
+        {{ input('contact_number', 'Contact Number', type='tel', autocomplete='tel', placeholder='+63 82 123 4567') }}
+        {{ input('official_email', 'Official Email', type='email', autocomplete='off', placeholder='info@hospital.example', hint='The hospital\'s public contact address.') }}
+        {{ input('ed_contact', 'Emergency Department Contact', placeholder='ER desk phone or name') }}
+        {{ input('license_number', 'Hospital License / Accreditation Number', required=false, span=true) }}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend class="text-[0.6875rem] font-mono text-cyanAccent tracking-widest mb-3">ACCOUNT INFORMATION</legend>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {{ input('admin_name', 'Administrator Full Name', autocomplete='name') }}
+        {{ input('position', 'Position / Role', autocomplete='organization-title', placeholder='e.g. ER Head Nurse') }}
+        {{ input('email', 'Email', type='email', autocomplete='username', span=true, hint='You sign in to the Hospital Portal with this email.') }}
+        {{ input('password', 'Password', type='password', autocomplete='new-password', hint='At least ' ~ min_password ~ ' characters with an uppercase letter, a lowercase letter and a number.', attrs='minlength="' ~ min_password ~ '"') }}
+        {{ input('confirm_password', 'Confirm Password', type='password', autocomplete='new-password') }}
+      </div>
+    </fieldset>
+
+    <div>
+      <label class="flex items-start gap-3 cursor-pointer select-none">
+        <input type="checkbox" name="agree" value="1" required class="mt-0.5 w-4 h-4 rounded accent-cyan-400" {{ 'checked' if form.get('agree') }}>
+        <span class="text-xs text-slate-300">I agree to the ERMS Hospital Portal Terms and Privacy Policy.</span>
+      </label>
+      {% if errors.get('agree') %}<p class="text-xs text-red-400 mt-1">{{ errors['agree'] }}</p>{% endif %}
+    </div>
+
+    <button type="submit" data-loading-text="Creating hospital account…"
+            class="btn-glow w-full py-3 px-4 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] text-[#050A12] font-semibold text-sm tracking-wide flex items-center justify-center gap-2">
+      <span data-label>Create Hospital Account — Free</span>
+      <svg data-spinner class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+    </button>
+    <p class="text-center text-xs text-slate-300">
+      Already have an account?
+      <a href="{{ url_for('hospital_auth.login') }}" class="text-cyanAccent hover:text-cyan-300 font-medium hover:underline ml-1">Sign In</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

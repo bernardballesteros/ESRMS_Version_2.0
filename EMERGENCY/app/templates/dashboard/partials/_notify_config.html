@@ -1,0 +1,10 @@
+{# Settings for static/js/notifications.js. Set `notify_watch` on pages that should raise live alerts. #}
+<script type="application/json" id="notify-config">{{ {
+  'userId': current_user.id,
+  'watch': notify_watch|default(false),
+  'preferences': url_for('account.get_notifications'),
+  'securityEvents': url_for('account.security_events'),
+  'announcements': url_for('announcements.public_announcements'),
+  'realtime': {'url': config.SUPABASE_URL, 'key': config.SUPABASE_KEY},
+  'icon': url_for('static', filename='img/emblem.svg'),
+} | tojson }}</script>

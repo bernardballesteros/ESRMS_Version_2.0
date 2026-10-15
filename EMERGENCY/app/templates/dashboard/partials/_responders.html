@@ -1,0 +1,19 @@
+{# Bottom-right: registered organization bases (EMS, fire, police, barangay, hospital, other) from the database.
+   Filled by static/js/organizations.js. A base is a fixed location; no individual responder is tracked. #}
+<section id="org-panel" class="bg-brand-card rounded-lg border border-brand-border p-3.5 flex flex-col shadow-tacticalCyan flex-1 min-h-[15rem] max-h-[50vh] lg:max-h-none lg:h-0 lg:min-h-[15rem]" aria-labelledby="org-panel-title">
+  <div class="flex items-center justify-between gap-2 mb-2.5 shrink-0">
+    <h2 id="org-panel-title" class="flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-white">
+      <span class="material-symbols-outlined text-brand-cyan text-[1.125rem]" aria-hidden="true">domain</span>
+      Organization Locations
+    </h2>
+    {% if can_dispatch %}
+    <button type="button" id="org-add"
+            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[0.6875rem] font-semibold bg-gradient-to-r from-[#00D9FF] to-[#1685FF] hover:brightness-110 text-[#050A12]">
+      <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">add</span>Add Organization
+    </button>
+    {% endif %}
+  </div>
+  <div id="org-list" class="flex-1 overflow-y-auto -mr-1.5 pr-1.5 flex flex-col gap-1.5" aria-live="polite" aria-busy="true">
+    <div class="h-12 shrink-0 rounded-md bg-[#141a2b] border border-brand-borderSubtle animate-pulse"></div>
+  </div>
+</section>

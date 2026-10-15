@@ -1,0 +1,80 @@
+{% from "account/_macros.html" import card, primary, secondary, outline, switch, form_error %}
+{% set category_icons = {
+  'emergency_incidents': 'warning', 'new_reports': 'description', 'dispatch_updates': 'local_shipping',
+  'status_updates': 'sync_alt', 'system_announcements': 'campaign', 'security_alerts': 'shield',
+} %}
+{% set test_button = "mt-1 mb-2 ml-9 text-xs text-brand-cyan underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed" %}
+<form id="notifications-form" novalidate>
+  {{ form_error('notifications-form-error') }}
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <section class="{{ card }} p-5" aria-labelledby="prefs-title">
+      <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-brand-cyan text-[1.625rem]" aria-hidden="true">tune</span>
+        <div>
+          <h2 id="prefs-title" class="text-sm font-bold text-white">Notification Preferences</h2>
+          <p class="text-xs text-slate-400">A category you switch off is not sent to you by any method. The incident list itself always updates live.</p>
+        </div>
+      </div>
+      <div class="mt-3 divide-y divide-brand-borderSubtle">
+        {% for key, item in account_config.categories.items() %}
+        {{ switch(key, item.label, item.description, icon=category_icons[key]) }}
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="{{ card }} p-5" aria-labelledby="delivery-title">
+      <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-brand-cyan text-[1.625rem]" aria-hidden="true">send</span>
+        <div>
+          <h2 id="delivery-title" class="text-sm font-bold text-white">Delivery Methods</h2>
+          <p class="text-xs text-slate-400">In-console alerts are always used. Choose extra ways to be notified.</p>
+        </div>
+      </div>
+      <div class="mt-3 divide-y divide-brand-borderSubtle">
+        <div>
+          {{ switch('email_enabled', 'Email Notifications', 'Sent to your verified account email', icon='mail') }}
+          <p id="email-status" class="text-[0.6875rem] pl-9 text-slate-500" role="status"></p>
+          <button type="button" id="email-test" class="{{ test_button }}">Send a test email</button>
+        </div>
+        <div>
+          {# Not a saved preference: switching it subscribes or unsubscribes this browser straight away. #}
+          {{ switch('push_device', 'Push Notifications on This Device', 'Delivered even when ESRMS is closed', icon='phonelink_ring') }}
+          <p id="push-status" class="text-[0.6875rem] pl-9 text-slate-500" role="status"></p>
+          <button type="button" id="push-test" class="{{ test_button }}">Send a test push</button>
+        </div>
+        <div>
+          {{ switch('browser_enabled', 'Desktop Alerts While Open', 'Shown by the open ESRMS tab when it is in the background', icon='desktop_windows') }}
+          <p id="browser-permission" class="text-[0.6875rem] pb-2 pl-9" role="status"></p>
+        </div>
+      </div>
+      <p class="text-[0.6875rem] text-slate-500 mt-3">Push needs a supported browser, notification permission and a network connection. A device that is offline receives the alert when it reconnects, for up to an hour.</p>
+    </section>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-2 mt-4">
+    <p id="notifications-saved" class="text-[0.6875rem] text-slate-500"></p>
+    <div class="flex gap-2 ml-auto">
+      <button type="button" data-cancel class="{{ secondary }}">Cancel</button>
+      <button type="submit" class="{{ primary }}">Save Preferences</button>
+    </div>
+  </div>
+</form>
+
+<section class="{{ card }} p-5 mt-4" aria-labelledby="recent-title">
+  <h2 id="recent-title" class="text-sm font-bold text-white">Recent Deliveries</h2>
+  <p class="text-xs text-slate-400">What was actually handed to the email and push providers for your account.</p>
+  <ul id="delivery-log" class="mt-3 text-xs divide-y divide-brand-borderSubtle"></ul>
+</section>
+
+{# Shown before the browser's own permission prompt, so the user knows why it is being asked. #}
+<dialog id="notify-permission" aria-labelledby="notify-permission-title" class="backdrop:bg-black/70 bg-transparent p-0 w-full max-w-sm text-slate-100">
+  <form method="dialog" class="rounded-xl bg-[#0d1424] border border-brand-border shadow-2xl p-6 text-center">
+    <span class="material-symbols-outlined text-brand-cyan text-[2.75rem]" aria-hidden="true">notifications_active</span>
+    <h2 id="notify-permission-title" class="text-base font-bold text-white mt-2">Allow Notifications</h2>
+    <p class="text-sm text-slate-400 mt-2">ESRMS wants to send you notifications about emergency alerts, updates and important information, so you stay informed in real time. Your browser will ask you to confirm.</p>
+    <div class="flex justify-center gap-3 mt-5">
+      <button value="cancel" class="{{ outline }}">Not Now</button>
+      <button value="ok" class="{{ primary }}">Allow</button>
+    </div>
+  </form>
+</dialog>

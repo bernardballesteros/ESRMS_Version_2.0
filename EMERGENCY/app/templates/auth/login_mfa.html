@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Verify Sign-In{% endblock %}
+{% block background %}
+<div class="fixed inset-0 bg-grid-tech pointer-events-none opacity-40"></div>
+<div class="fixed inset-0 ambient-radial pointer-events-none"></div>
+{% endblock %}
+
+{% set field = "w-full px-4 py-2.5 bg-transparent rounded-[10px] text-white font-mono placeholder-gray-600 focus:outline-none" %}
+{% set submit = "btn-glow w-full py-3 px-4 rounded-[10px] bg-gradient-to-r from-[#00D9FF] to-[#1685FF] text-[#050A12] font-semibold text-sm tracking-wide flex items-center justify-center gap-2 cursor-pointer" %}
+
+{% block content %}
+<main class="relative z-10 w-full max-w-md mx-auto px-4 py-12 flex-1 flex items-center justify-center">
+  <div class="w-full rounded-[20px] p-6 sm:p-8 bg-[#0D1420]/90 border border-cyan-500/25 cyan-glow shadow-2xl">
+    <div class="flex items-center justify-between mb-1">
+      <h1 class="text-2xl font-bold text-white tracking-tight">Verify It's You</h1>
+      <div class="w-7 h-7 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+    </div>
+
+    {% if reset_code %}
+    {# Shown once, right after the request was recorded. #}
+    <p class="text-xs text-textMuted mb-4">Your reset request was sent to the ESRMS administrators.</p>
+    {% include "partials/_flashes.html" %}
+    <div class="rounded-[12px] border border-amber-500/40 bg-amber-950/20 p-4 text-center" role="status">
+      <p class="text-xs text-amber-200">Your reference code</p>
+      <p class="text-2xl font-mono font-bold text-white tracking-[0.2em] mt-1 select-all">{{ reset_code }}</p>
+    </div>
+    <ol class="text-xs text-gray-300 mt-4 space-y-2 list-decimal pl-4">
+      <li>Contact an ESRMS administrator directly (by phone or in person).</li>
+      <li>They will verify who you are, then ask you to read out this code. It is shown only now and expires in 24 hours.</li>
+      <li>Once they approve, sign in with your password and set up your authenticator again.</li>
+    </ol>
+    <p class="text-[0.6875rem] text-gray-500 mt-4">Never send this code by email or chat, and never give it to someone who contacts you first.</p>
+
+    {% elif mode == 'recovery' %}
+    <p class="text-xs text-textMuted mb-6">Enter one of the recovery codes you saved when you set up MFA. Each code works once. Using one removes your current authenticators so you can set up a new one.</p>
+    {% include "partials/_flashes.html" %}
+    <form method="post" action="{{ url_for('auth.login_mfa', mode='recovery') }}" class="space-y-4">
+      <div class="space-y-1.5">
+        <label for="recovery_code" class="block text-xs font-medium text-gray-300 tracking-wide">Recovery Code</label>
+        <div class="input-field rounded-[10px] bg-[#070D18] border border-cyan-500/20">
+          <input id="recovery_code" name="recovery_code" autocomplete="off" spellcheck="false" maxlength="24" required autofocus placeholder="XXXX-XXXX-XXXX-XXXX" class="{{ field }} text-sm uppercase tracking-widest">
+        </div>
+      </div>
+      <button type="submit" data-loading-text="Checking..." class="{{ submit }}"><span data-label>Use Recovery Code</span></button>
+    </form>
+
+    {% elif mode == 'reset' %}
+    <p class="text-xs text-textMuted mb-6">No authenticator and no recovery codes? An ESRMS administrator can reset MFA for you after verifying your identity. Your account stays protected until they approve.</p>
+    {% include "partials/_flashes.html" %}
+    <form method="post" action="{{ url_for('auth.login_mfa', mode='reset') }}">
+      <button type="submit" data-loading-text="Sending request..." class="{{ submit }}"><span data-label>Request Administrator Reset</span></button>
+    </form>
+
+    {% else %}
+    <p class="text-xs text-textMuted mb-6">Multi-factor authentication is on for this account. Enter the 6-digit code from your authenticator app.</p>
+    {% include "partials/_flashes.html" %}
+    <form method="post" action="{{ url_for('auth.login_mfa') }}" class="space-y-4">
+      <div class="space-y-1.5">
+        <label for="code" class="block text-xs font-medium text-gray-300 tracking-wide">Authenticator Code</label>
+        <div class="input-field rounded-[10px] bg-[#070D18] border border-cyan-500/20">
+          <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required autofocus placeholder="123456" class="{{ field }} text-lg tracking-[0.4em]">
+        </div>
+      </div>
+      <button type="submit" data-loading-text="Verifying..." class="{{ submit }}">
+        <span data-label>Verify &amp; Sign In</span>
+        <svg data-spinner class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+      </button>
+    </form>
+    {% endif %}
+
+    <nav aria-label="Other ways to verify" class="mt-6 pt-4 border-t border-cyan-500/10 text-xs space-y-2 text-center">
+      {% if mode != 'code' or reset_code %}<a href="{{ url_for('auth.login_mfa') }}" class="block text-cyanAccent hover:underline">Use my authenticator app</a>{% endif %}
+      {% if mode != 'recovery' and not reset_code %}<a href="{{ url_for('auth.login_mfa', mode='recovery') }}" class="block text-cyanAccent hover:underline">Lost your authenticator? Use a recovery code</a>{% endif %}
+      {% if mode != 'reset' and not reset_code %}<a href="{{ url_for('auth.login_mfa', mode='reset') }}" class="block text-gray-400 hover:text-cyanAccent hover:underline">No recovery codes either? Ask an administrator</a>{% endif %}
+      <a href="{{ url_for('auth.logout') }}" class="block text-gray-500 hover:text-cyanAccent hover:underline">Cancel and use a different account</a>
+    </nav>
+  </div>
+</main>
+{% endblock %}
